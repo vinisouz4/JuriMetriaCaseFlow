@@ -7,3 +7,4 @@ colorlog
 python-dotenv
 openpyxl
 polars
+certifi
