@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Dev",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "test.py",
+            "console": "integratedTerminal",
+            "python": "/Users/viniciussouza/Codes/JuriMetriaCaseFlow/venv/bin/python"
+        }
+    ]
+}

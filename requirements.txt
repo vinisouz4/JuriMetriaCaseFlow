@@ -1,0 +1,9 @@
+supabase
+pandas
+numpy
+sqlalchemy
+streamlit
+colorlog
+python-dotenv
+openpyxl
+polars
