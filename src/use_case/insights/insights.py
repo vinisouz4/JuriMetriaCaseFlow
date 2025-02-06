@@ -1,6 +1,7 @@
 from src.adapter.logging.logging import LoggerHandler
-from src.use_case.dataCaseFlow.readData import ReadCaseFlowData
 from src.use_case.dataDataJud.readDataJud import ReadDataJud
+from src.use_case.filteredColumns.columnsCaseFlow.tableCase import columnsTableCase
+from src.utils.utils import Utils
 
 
 
@@ -8,10 +9,54 @@ from src.use_case.dataDataJud.readDataJud import ReadDataJud
 
 class Insights():
     def __init__(self, IDataFrame):
-        self.dataFrame = IDataFrame
+        self.dataframe = IDataFrame
         self.readDataJud = ReadDataJud()
-        self.readCaseFlowData = ReadCaseFlowData(IDataFrame)
         self.logger = LoggerHandler("Insights")
+        self.utils = Utils()
 
-    
+    def totalProcess(self, df):
+        try:
+            self.logger.INFO("Started calculating total process")
+            
+            data = df[columnsTableCase]
+            
+            totalProcess = data.shape[0]
+            
+            self.logger.INFO(f"Total process: {totalProcess}")
+            
+            return totalProcess
+
+        except Exception as e:
+            self.logger.ERROR(f"Error in totalProcess: {e}")
+            return None
+
+    def distributionData(self, df, dateColumn):
+        try:
+
+            """
+            Método para calcular os processos distruibuídos nos ultimos 30 dias e nos ultimos 7 dias
+            Considerando a coluna do DataFrame: distribution_date
+            """
+
+            self.logger.INFO("Started calculating distribution data")
+
+            data = self.dataframe.to_datetime(df, [dateColumn])
+
+            today = self.utils.getToday()
+
+            # Definindo as datas de 30 e 7 dias atrás
+            # lastSixtyDaysProcess = self.dataframe.getPastDate(60, today)
+            lastThirtyDaysProcess = self.dataframe.getPastDate(30, today)
+            lastSevenDaysProcess = self.dataframe.getPastDate(7, today)
+
+            # Filtrando os processos distribuídos nos ultimos 30 dias
+            thirtyDaysProcess = data[data[dateColumn] >= lastThirtyDaysProcess].shape[0]
+            sevenDaysProcess = data[data[dateColumn] >= lastSevenDaysProcess].shape[0]
+
+            self.logger.INFO(f"Total process distributed in the last 30 days: {thirtyDaysProcess} and in the last 7 days: {sevenDaysProcess}")
+            
+            return thirtyDaysProcess, sevenDaysProcess
+        except Exception as e:
+            self.logger.ERROR(f"Error in distributionData: {e}")
+            return None
         

@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from src.adapter.logging.logging import LoggerHandler
 
@@ -59,3 +60,17 @@ class Utils():
         
         except Exception as e:
             self.logger.ERROR(f"Error generating payload: {e}")
+
+    def getToday(self):
+        """
+        Retorna a data de hoje no formato 'YYYY-MM-DD'
+        """
+        try:
+            self.logger.INFO("Getting today's date")
+            self.logger.INFO("Today's date retrieved successfully")
+
+            return datetime.today().date()
+        
+        except Exception as e:
+            self.logger.ERROR(f"Error getting today's date: {e}")
+            return None

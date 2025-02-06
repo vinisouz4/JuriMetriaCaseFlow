@@ -21,7 +21,7 @@ class Supabase():
             Conecta ao banco de dados do Supabase
             """
 
-            self.logger.INFO(f"Connecting to Supabase")
+            self.logger.INFO(f"Connecting to Supabase: {self.settings.API_SUPABASE_URL}")
 
             Client = create_client(
                 self.settings.API_SUPABASE_URL, 
@@ -35,7 +35,7 @@ class Supabase():
         except Exception as e:
             self.logger.ERROR(f"Error connecting to Supabase: {e}")
     
-    def getData(self, table: str) -> list:
+    def getData(self, table: str, activedFilter: str = None) -> list:
         try:
 
             """
@@ -49,8 +49,16 @@ class Supabase():
             client = self.__connect()
             
             self.logger.INFO(f"Getting data from table: {table}")
+
+            if activedFilter is not None:
+                self.logger.INFO(f"Filtering data by actived: {activedFilter}")
+                
+                data = client.from_(table).select("*").eq("active", activedFilter).execute()
             
-            data = client.from_(table).select("*").execute()
+            else:
+                self.logger.INFO(f"Filtering data isn't informed")
+                
+                data = client.from_(table).select("*").execute()
 
             self.logger.INFO(f"Data from table {table} retrieved successfully")
             

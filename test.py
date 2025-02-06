@@ -5,21 +5,30 @@ from src.use_case.dataDataJud.readDataJud import ReadDataJud
 from src.adapter.core.config import Settings
 import asyncio
 
+from src.use_case.insights.insights import Insights
+
 teste = ReadDataJud()
 
 settings = Settings()
 
+insights = Insights(PandasDataFrame())
+
+testeSupa = ReadCaseFlowData(PandasDataFrame())
+
+df = testeSupa.getData("Case", "true")
+
+print(insights.distributionData(df, "distribution_date"))
 
 
 
 
 
-asyncio.run(teste.getData(
-    url = settings.API_PUBLI_DATAJUD, 
-    processNumber=["10013836720245020262"], 
-    headers={
-        "Authorization": settings.API_PUBLI_DATAJUD_KEY,
-        "Content-Type": "application/json"
-    },
-    numberEndPoint=2
-))
+# asyncio.run(teste.getData(
+#     url = settings.API_PUBLI_DATAJUD, 
+#     processNumber=["10013836720245020262"], 
+#     headers={
+#         "Authorization": settings.API_PUBLI_DATAJUD_KEY,
+#         "Content-Type": "application/json"
+#     },
+#     numberEndPoint=2
+# ))

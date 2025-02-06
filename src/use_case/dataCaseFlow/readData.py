@@ -14,10 +14,10 @@ class ReadCaseFlowData():
         self.supabase = Supabase()
         
 
-    def getData(self, table: str):
+    def getData(self, table: str, activedFilter: str = None):
         self.logger.INFO("Reading data from Supabase")
         
-        data = self.supabase.getData(table)
+        data = self.supabase.getData(table, activedFilter)
 
         dfData = self.dataframe.to_DataFrame(data)
         

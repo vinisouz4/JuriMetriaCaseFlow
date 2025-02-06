@@ -11,3 +11,11 @@ class IDataFrameAdapter(abc.ABC):
     @abc.abstractmethod
     def to_DataFrame(self, data: list):
         pass
+
+    @abc.abstractmethod
+    def to_datetime(self, data, column: list):
+        pass
+
+    @abc.abstractmethod
+    def getPastDate(self, days: int, today):
+        pass
