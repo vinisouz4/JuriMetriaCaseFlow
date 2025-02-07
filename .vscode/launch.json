@@ -8,6 +8,23 @@
             "program": "test.py",
             "console": "integratedTerminal",
             "python": "/Users/viniciussouza/Codes/JuriMetriaCaseFlow/venv/bin/python"
+        },
+        {
+            "name": "Streamlit Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "streamlit",
+            "args": [
+                "run",
+                "src/pages/main.py",
+                "--server.port=8501",
+                "--server.address=0.0.0.0"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
         }
     ]
 }

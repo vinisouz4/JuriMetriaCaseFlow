@@ -53,3 +53,41 @@ class PandasDataFrame():
         except Exception as e:
             self.logger.ERROR(f"Error in timedelta: {e}")
             return None
+        
+    def groupby(self, df, columns: list, agg: dict) -> pd.DataFrame:
+        try:
+            """
+            Parameters:
+            df: pd.DataFrame - DataFrame to group
+            columns: list - List of columns to group by
+            agg: dict - Dictionary with columns and aggregation functions
+                - Model: {'column': 'agg_function'}
+            """
+
+            self.logger.INFO(f"Grouping data by columns: {columns}")
+
+            data = df.groupby(columns).agg(agg).reset_index()
+
+            self.logger.INFO("Data grouped successfully")
+            
+            return data
+        except Exception as e:
+            self.logger.ERROR(f"Error in groupby: {e}")
+            return None
+        
+    def convertToFloat(self, value: str) -> float:
+        try:
+            self.logger.INFO(f"Converting value to float")
+
+            if value is None or pd.isna(value) or value == "":
+                return 0.0
+
+            value = value.replace("R$", "").replace("\xa0", "")
+            value = value.replace(".", "").replace(",", ".")
+
+            self.logger.INFO(f"Value converted to float")
+
+            return float(value)
+        except Exception as e:
+            self.logger.ERROR(f"Error in convertToFloat: {e}")
+            return None

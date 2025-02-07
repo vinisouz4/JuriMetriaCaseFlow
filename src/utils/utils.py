@@ -74,3 +74,35 @@ class Utils():
         except Exception as e:
             self.logger.ERROR(f"Error getting today's date: {e}")
             return None
+
+    def getLatLong(self, uf):
+        try:
+
+            """
+            Método para retornar a latitude e longitude de um estado brasileiro
+            """
+            
+            self.logger.INFO(f"Getting latitude and longitude from UF: {uf}")
+
+            uf_coordinates = {
+                "AC": (-9.0238, -70.8111), "AL": (-9.5713, -36.7820), "AP": (0.9020, -52.0030),
+                "AM": (-3.4168, -65.8561), "BA": (-12.5797, -41.7007), "CE": (-5.4984, -39.3206),
+                "DF": (-15.7998, -47.8645), "ES": (-19.1834, -40.3089), "GO": (-15.8270, -49.8362),
+                "MA": (-5.4200, -45.4326), "MT": (-12.6819, -56.9211), "MS": (-20.7722, -54.7852),
+                "MG": (-18.5122, -44.5550), "PA": (-3.4168, -52.4500), "PB": (-7.2399, -36.7819),
+                "PR": (-24.6170, -51.9022), "PE": (-8.8137, -36.9541), "PI": (-6.6876, -42.7374),
+                "RJ": (-22.9068, -43.1729), "RN": (-5.7945, -36.3205), "RS": (-30.0346, -51.2177),
+                "RO": (-10.9472, -62.8278), "RR": (2.7376, -61.3790), "SC": (-27.2423, -50.2189),
+                "SP": (-23.5505, -46.6333), "SE": (-10.5741, -37.3857), "TO": (-10.1753, -48.2982),
+            }
+
+            lat, long = uf_coordinates.get(uf, (None, None))
+
+            self.logger.INFO(f"Latitude and longitude retrieved successfully")
+
+            return lat, long
+        
+        except Exception as e:
+            self.logger.ERROR(f"Error getting latitude and longitude: {e}")
+            return None, None
+

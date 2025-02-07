@@ -60,3 +60,28 @@ class Insights():
             self.logger.ERROR(f"Error in distributionData: {e}")
             return None
         
+    def totalUf(self, df):
+        try:
+            self.logger.INFO("Started calculating total uf")
+
+            df["uf_count"] = df["uf"]
+
+            agg = {
+                'uf_count': 'count',  # Conta a quantidade de ocorrências de cada UF
+                'value_cause': 'sum'  # Soma dos valores da coluna Value_cause
+            }
+
+            groupbyData = self.dataframe.groupby(df, ['uf'], agg)
+
+
+
+            groupbyData["value_cause"] = groupbyData["value_cause"].apply(lambda x: f"{x:.2f}")
+
+            groupbyData["latitude"], groupbyData["longitude"] = zip(*groupbyData["uf"].map(self.utils.getLatLong))
+            
+            self.logger.INFO(f"Total uf: {groupbyData}")
+            
+            return groupbyData
+        except Exception as e:
+            self.logger.ERROR(f"Error in totalUf: {e}")
+            return None

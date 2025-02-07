@@ -17,8 +17,7 @@ testeSupa = ReadCaseFlowData(PandasDataFrame())
 
 df = testeSupa.getData("Case", "true")
 
-print(insights.distributionData(df, "distribution_date"))
-
+print(insights.totalUf(df))
 
 
 

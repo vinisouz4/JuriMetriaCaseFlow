@@ -20,5 +20,7 @@ class ReadCaseFlowData():
         data = self.supabase.getData(table, activedFilter)
 
         dfData = self.dataframe.to_DataFrame(data)
+
+        dfData["value_cause"] = dfData["value_cause"].apply(self.dataframe.convertToFloat)
         
         return dfData

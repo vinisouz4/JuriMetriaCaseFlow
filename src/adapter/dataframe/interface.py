@@ -19,3 +19,11 @@ class IDataFrameAdapter(abc.ABC):
     @abc.abstractmethod
     def getPastDate(self, days: int, today):
         pass
+
+    @abc.abstractmethod
+    def groupby(self, df, columns: list, agg: dict):
+        pass
+
+    @abc.abstractmethod
+    def convertToFloat(self, value: str) -> float:
+        pass
