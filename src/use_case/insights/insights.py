@@ -75,9 +75,11 @@ class Insights():
 
 
 
-            groupbyData["value_cause"] = groupbyData["value_cause"].apply(lambda x: f"{x:.2f}")
+            # groupbyData["value_cause"] = groupbyData["value_cause"].apply(lambda x: f"{x:.2f}")
 
             groupbyData["latitude"], groupbyData["longitude"] = zip(*groupbyData["uf"].map(self.utils.getLatLong))
+
+            groupbyData = groupbyData[groupbyData["latitude"].notna() & groupbyData["longitude"].notna()]
             
             self.logger.INFO(f"Total uf: {groupbyData}")
             

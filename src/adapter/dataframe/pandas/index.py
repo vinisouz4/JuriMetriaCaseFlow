@@ -77,7 +77,7 @@ class PandasDataFrame():
         
     def convertToFloat(self, value: str) -> float:
         try:
-            self.logger.INFO(f"Converting value to float")
+            self.logger.INFO(f"Converting value to float: {value}")
 
             if value is None or pd.isna(value) or value == "":
                 return 0.0
