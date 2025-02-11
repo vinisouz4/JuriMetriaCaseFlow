@@ -91,3 +91,16 @@ class PandasDataFrame():
         except Exception as e:
             self.logger.ERROR(f"Error in convertToFloat: {e}")
             return None
+
+    def removeSpecialCharacters(self, value: str) -> str:
+        try:
+            self.logger.INFO(f"Removing special characters from value: {value}")
+
+            value = value.replace(".", "").replace("-", "")
+
+            self.logger.INFO(f"Special characters removed")
+
+            return value
+        except Exception as e:
+            self.logger.ERROR(f"Error in removeSpecialCharacters: {e}")
+            return None

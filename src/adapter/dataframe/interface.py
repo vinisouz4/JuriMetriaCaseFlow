@@ -27,3 +27,7 @@ class IDataFrameAdapter(abc.ABC):
     @abc.abstractmethod
     def convertToFloat(self, value: str) -> float:
         pass
+
+    @abc.abstractmethod
+    def removeSpecialCharacters(self, value: str) -> str:
+        pass

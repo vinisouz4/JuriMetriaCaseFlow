@@ -14,6 +14,8 @@ class Settings():
 
         PATH_EXCEL_TESTE = os.getenv("PATH_EXCEL_TESTE")
 
+        DATALAKE_URL = os.getenv("DATALAKE_URL")
+
     except Exception as e:
         API_SUPABASE_URL = None
         API_SUPABASE_KEY = None
@@ -22,3 +24,5 @@ class Settings():
         API_PUBLI_DATAJUD_KEY = None
 
         PATH_EXCEL_TESTE = None
+
+        DATALAKE_URL = None

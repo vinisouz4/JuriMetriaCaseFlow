@@ -1,5 +1,5 @@
 from src.adapter.logging.logging import LoggerHandler
-from src.use_case.dataDataJud.readDataJud import ReadDataJud
+from src.api.apiDataJud.getAPIDataJud import ReadDataJud
 from src.use_case.filteredColumns.columnsCaseFlow.tableCase import columnsTableCase
 from src.utils.utils import Utils
 
@@ -13,7 +13,7 @@ class Insights():
         self.readDataJud = ReadDataJud()
         self.logger = LoggerHandler("Insights")
         self.utils = Utils()
-
+    
     def totalProcess(self, df):
         try:
             self.logger.INFO("Started calculating total process")

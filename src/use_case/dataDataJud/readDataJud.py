@@ -1,21 +1,34 @@
-from src.adapter.requests.index import Requests
+
+import json
 
 
-class ReadDataJud():
-    def __init__(self):
-        self.requests = Requests()
+from src.adapter.core.config import Settings
+from src.adapter.dataframe.interface import IDataFrameAdapter
+from src.adapter.logging.logging import LoggerHandler
+from src.utils.utils import Utils
 
-    async def getData(self, url: str, processNumber: list, headers: dict = None, numberEndPoint: int = 1):
-        """
-        Parameters:
-        - url (str): Url da requisição;
-        - processNumber (list): Lista de números de processo;
-        - headers (dict): Headers da requisição;
-        - payload (dict): Dicionario com os dados de filtros para a requisicao;
-        - numberEndPoint (int): Número do endpoint da requisição.
 
-        Returns:
-        - Irá me retornar uma lista de dicionários com os dados de cada processo.
-        """
+class ReadDataJud:
+    def __init__(self, dataframe: IDataFrameAdapter):
+        self.logger = LoggerHandler("ReadDataJud")
+        self.dataframe = dataframe
+        self.settings = Settings()
+        self.utils = Utils()
 
-        return await self.requests.get(url, processNumber, headers, numberEndPoint)
+    def readDataJud(self):
+        try:
+            self.logger.INFO("Reading data from DataJud DataLake")
+            results = []
+
+            dictData = json.load(
+                open(
+                    f"{self.settings.DATALAKE_URL}data_{self.utils.getToday()}.json", "r"
+                )
+            )
+
+            dictData
+
+
+        except Exception as e:
+            self.logger.ERROR(f"Error in readDataJud: {e}")
+            return None

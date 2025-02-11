@@ -1,0 +1,69 @@
+from src.adapter.core.config import Settings
+from src.adapter.logging.logging import LoggerHandler
+from src.adapter.requests.index import Requests
+import asyncio
+import json
+
+from src.use_case.tribunais.tribunais import getTribunalNumber
+from src.utils.utils import Utils
+
+
+
+class getDataJud():
+    def __init__(self):
+        self.requests = Requests()
+        self.logger = LoggerHandler("getDataJud")
+        self.util = Utils()
+        self.settings = Settings()
+
+    async def getData(self, url: str, processNumber: list, headers: dict = None, numberEndPoint: int = 1):
+        """
+        Parameters:
+        - url (str): Url da requisição;
+        - processNumber (list): Lista de números de processo;
+        - headers (dict): Headers da requisição;
+        - payload (dict): Dicionario com os dados de filtros para a requisicao;
+        - numberEndPoint (int): Número do endpoint da requisição.
+
+        Returns:
+        - Irá me retornar uma lista de dicionários com os dados de cada processo.
+        """
+
+        return await self.requests.get(url, processNumber, headers, numberEndPoint)
+    
+    
+    def saveData(self, df):
+
+        """
+        Metodo para buscar os processo na API do DataJud e salvar um arquivo no Data Lake com os dados
+        """
+
+        try:
+            self.logger.INFO("Starting saving data")
+            
+            # Retirar isso depois da aprovacao do projeto
+            df = df[df["client_id"].isin([13, 30, 1248]) & df["uf"].isin(["SP"])]
+
+            df["endpoint_tribunal"] = df["tribunal_justica"].apply(getTribunalNumber)
+
+            # Após validacao, salvar os dados dentro de um data lake na nuvem ou fisico
+            with open(f"./src/data/lake/data_{self.util.getToday()}.json", "w") as f:
+                for i in df["endpoint_tribunal"].unique():
+                    print(i)
+                    listNumbers = df[df["endpoint_tribunal"] == i]["external_number"].tolist()
+                    request = asyncio.run(self.getData(
+                        url = self.settings.API_PUBLI_DATAJUD, 
+                        processNumber=listNumbers, 
+                        headers={
+                            "Authorization": self.settings.API_PUBLI_DATAJUD_KEY,
+                            "Content-Type": "application/json"
+                        },
+                        numberEndPoint=i
+                    ))
+                    
+                    json.dump(request, f, indent=4, ensure_ascii=False)
+            
+            self.logger.INFO("Data saved successfully")
+        except Exception as e:
+            self.logger.ERROR(f"Error in saveData: {e}")
+            return None
