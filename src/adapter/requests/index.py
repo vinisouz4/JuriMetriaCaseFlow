@@ -7,6 +7,7 @@ import ssl
 
 from src.adapter.logging.logging import LoggerHandler
 from src.utils.utils import Utils
+from src.use_case.tribunais.tribunais import getTribunalNumber
 
 
 class Requests():
@@ -44,15 +45,14 @@ class Requests():
             self.logger.ERROR(f"Error getting data from url: {e}")
 
     
-    async def get(self, url: str, processNumber: list, headers: dict, numberEndPoint: int):
+    async def get(self, url: str, processNumber, headers: dict):
 
         """
         Parameters:
         - url (str): Url da requisição;
-        - processNumber (list): Lista de números de processo;
+        - processNumber (dataframe): dataframe com os dados de processos e endpoint;
         - headers (dict): Headers da requisição;
         - payload (dict): Dicionario com os dados de filtros para a requisicao.
-        - numberEndPoint (int): Número do endpoint da requisição.
 
         Returns:
         - Irá me retornar uma lista de dicionários com os dados de cada processo.
@@ -60,21 +60,32 @@ class Requests():
 
         try:
             
-            newUrl = url + f"api_publica_trt{numberEndPoint}/_search"
-            
-            self.logger.INFO(f"Getting data from url: {newUrl}")
+            self.logger.INFO(f"Getting data from url: {url}")
+
+            dfgrouped = processNumber.groupby("endpoint_tribunal")["external_number"].apply(list).reset_index()
+
+            responses = []
 
             # Certificado SSL para requisições https
             sslContext = ssl.create_default_context(cafile=certifi.where())
 
             async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=sslContext)) as session:
-                tasks = [self.__getProcessStatus(session, process, newUrl, headers) for process in processNumber]
-                
-                response = await asyncio.gather(*tasks)
+                tasks = []
 
-                self.logger.INFO(f"Data from url: {newUrl} retrieved successfully")
+                for index, row in dfgrouped.iterrows():
+                    self.logger.DEBUG(f"Endpoint: {row['endpoint_tribunal']}")
+                    endpoint = row["endpoint_tribunal"]
+                    numberProcess = row["external_number"]
+                    
+                    newUrl = url + f"api_publica_trt{endpoint}/_search"
 
-                return response
+                    self.logger.INFO(f"Data from url: {newUrl} retrieved successfully")
+
+                    tasks.extend([self.__getProcessStatus(session, process, newUrl, headers) for process in numberProcess])
+
+                results = await asyncio.gather(*tasks)
+
+                return results
             
         
         except Exception as e:

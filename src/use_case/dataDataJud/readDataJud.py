@@ -1,5 +1,6 @@
 
 import json
+from datetime import datetime
 
 
 from src.adapter.core.config import Settings
@@ -17,8 +18,7 @@ class ReadDataJud:
 
     def readDataJud(self):
         try:
-            self.logger.INFO("Reading data from DataJud DataLake")
-            results = []
+            self.logger.INFO(f"Reading data from DataJud DataLake, Date: {self.utils.getToday()}")
 
             dictData = json.load(
                 open(
@@ -26,8 +26,33 @@ class ReadDataJud:
                 )
             )
 
-            dictData
+            self.logger.INFO("Data read successfully")
 
+            resultado = []
+
+            for process in dictData:
+                for source in process["hits"]["hits"]:
+                    movimentos = source["_source"]["movimentos"]
+                    ultimo_movimento = max(movimentos, key=lambda x: datetime.strptime(x["dataHora"], "%Y-%m-%dT%H:%M:%S.%fZ"))
+
+                    results = {
+                        "processo": source["_source"]["numeroProcesso"],
+                        "data": ultimo_movimento["dataHora"],
+                        "movimento": ultimo_movimento["nome"]
+                    }
+
+                    resultado.append(results)
+
+
+            self.logger.INFO("Transforming data to DataFrame")
+
+            df = self.dataframe.to_DataFrame(resultado)
+
+            df = self.dataframe.to_datetime(df, ["data"])
+
+            self.logger.INFO("Data transformed successfully")
+
+            return df
 
         except Exception as e:
             self.logger.ERROR(f"Error in readDataJud: {e}")

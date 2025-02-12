@@ -16,11 +16,11 @@ class getDataJud():
         self.util = Utils()
         self.settings = Settings()
 
-    async def getData(self, url: str, processNumber: list, headers: dict = None, numberEndPoint: int = 1):
+    async def getData(self, url: str, processNumber, headers: dict = None):
         """
         Parameters:
         - url (str): Url da requisição;
-        - processNumber (list): Lista de números de processo;
+        - processNumber (dataframe): Dataframe com os dados para a requisição contendo o numero do processo e o endpoint;
         - headers (dict): Headers da requisição;
         - payload (dict): Dicionario com os dados de filtros para a requisicao;
         - numberEndPoint (int): Número do endpoint da requisição.
@@ -29,7 +29,7 @@ class getDataJud():
         - Irá me retornar uma lista de dicionários com os dados de cada processo.
         """
 
-        return await self.requests.get(url, processNumber, headers, numberEndPoint)
+        return await self.requests.get(url, processNumber, headers)
     
     
     def saveData(self, df):
@@ -48,20 +48,17 @@ class getDataJud():
 
             # Após validacao, salvar os dados dentro de um data lake na nuvem ou fisico
             with open(f"./src/data/lake/data_{self.util.getToday()}.json", "w") as f:
-                for i in df["endpoint_tribunal"].unique():
-                    print(i)
-                    listNumbers = df[df["endpoint_tribunal"] == i]["external_number"].tolist()
-                    request = asyncio.run(self.getData(
-                        url = self.settings.API_PUBLI_DATAJUD, 
-                        processNumber=listNumbers, 
-                        headers={
-                            "Authorization": self.settings.API_PUBLI_DATAJUD_KEY,
-                            "Content-Type": "application/json"
-                        },
-                        numberEndPoint=i
-                    ))
+
+                request = asyncio.run(self.getData(
+                    url = self.settings.API_PUBLI_DATAJUD, 
+                    processNumber=df, 
+                    headers={
+                        "Authorization": self.settings.API_PUBLI_DATAJUD_KEY,
+                        "Content-Type": "application/json"
+                    }
+                ))
                     
-                    json.dump(request, f, indent=4, ensure_ascii=False)
+                json.dump(request, f, indent=4, ensure_ascii=False)
             
             self.logger.INFO("Data saved successfully")
         except Exception as e:
