@@ -9,7 +9,7 @@ from src.adapter.logging.logging import LoggerHandler
 from src.utils.utils import Utils
 
 
-class ReadDataJud:
+class ReadDataJud():
     def __init__(self, dataframe: IDataFrameAdapter):
         self.logger = LoggerHandler("ReadDataJud")
         self.dataframe = dataframe
@@ -37,6 +37,7 @@ class ReadDataJud:
 
                     results = {
                         "processo": source["_source"]["numeroProcesso"],
+                        "dataAjuizamento": source["_source"]["dataAjuizamento"],
                         "data": ultimo_movimento["dataHora"],
                         "movimento": ultimo_movimento["nome"]
                     }
@@ -56,4 +57,18 @@ class ReadDataJud:
 
         except Exception as e:
             self.logger.ERROR(f"Error in readDataJud: {e}")
+            return None
+        
+    def statusGrouped(self, df):
+        try:
+            self.logger.INFO("Starting statusGrouped")
+
+            dfGrouped = self.dataframe.groupby(df, ["movimento"], {"processo": "count"})
+
+            self.logger.INFO("Status grouped successfully")
+
+            return dfGrouped
+
+        except Exception as e:
+            self.logger.ERROR(f"Error in statusGrouped: {e}")
             return None

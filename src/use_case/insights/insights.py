@@ -1,5 +1,5 @@
 from src.adapter.logging.logging import LoggerHandler
-from src.api.apiDataJud.getAPIDataJud import ReadDataJud
+from src.api.apiDataJud.getAPIDataJud import getDataJud
 from src.use_case.filteredColumns.columnsCaseFlow.tableCase import columnsTableCase
 from src.utils.utils import Utils
 
@@ -10,7 +10,7 @@ from src.utils.utils import Utils
 class Insights():
     def __init__(self, IDataFrame):
         self.dataframe = IDataFrame
-        self.readDataJud = ReadDataJud()
+        self.readDataJud = getDataJud()
         self.logger = LoggerHandler("Insights")
         self.utils = Utils()
     
@@ -28,6 +28,22 @@ class Insights():
 
         except Exception as e:
             self.logger.ERROR(f"Error in totalProcess: {e}")
+            return None
+
+    def totalValueCause(self, df):
+        try:
+            self.logger.INFO("Started calculating total value cause")
+
+            data = df[columnsTableCase]
+
+            totalValueCause = data["value_cause"].sum()
+
+            self.logger.INFO(f"Total value cause: {totalValueCause}")
+
+            return totalValueCause
+
+        except Exception as e:
+            self.logger.ERROR(f"Error in totalValueCause: {e}")
             return None
 
     def distributionData(self, df, dateColumn):
@@ -80,10 +96,12 @@ class Insights():
             groupbyData["latitude"], groupbyData["longitude"] = zip(*groupbyData["uf"].map(self.utils.getLatLong))
 
             groupbyData = groupbyData[groupbyData["latitude"].notna() & groupbyData["longitude"].notna()]
+
+            orderGroupData = groupbyData.sort_values(by="uf_count", ascending=False)
             
-            self.logger.INFO(f"Total uf: {groupbyData}")
+            self.logger.INFO(f"Total uf: {orderGroupData}")
             
-            return groupbyData
+            return orderGroupData
         except Exception as e:
             self.logger.ERROR(f"Error in totalUf: {e}")
             return None

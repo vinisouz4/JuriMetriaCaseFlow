@@ -8,3 +8,4 @@ python-dotenv
 openpyxl
 polars
 certifi
+plotly
