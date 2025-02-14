@@ -1,7 +1,7 @@
 import streamlit as st
 import sys
 import os
-import pydeck as pdk
+import plotly.express as px
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
@@ -14,47 +14,60 @@ from src.use_case.dataCaseFlow.readData import ReadCaseFlowData
 insights = Insights(PandasDataFrame())
 dataCaseFlow = ReadCaseFlowData(PandasDataFrame())
 
+dataCase = dataCaseFlow.getData("Case", "true")
+ufDf = insights.totalUf(dataCase)
+
 @st.cache_data
 def get_data():
     return dataCaseFlow.getData("Case", "true")
 
 data = insights.totalUf(get_data())
 
-st.title("Maps Test")
+st.title("Indicadores")
 
 
-layer = pdk.Layer(
-    "ScatterplotLayer",
-    data=data,
-    get_position=["longitude", "latitude"],
-    get_radius="uf_count",
-    get_color=[255, 75, 75],
-    pickable=True,
-    auto_highlight=True
+st.subheader("Mapa de calor")
+
+fig = px.scatter_map(
+    data, 
+    lat="latitude", 
+    lon="longitude", 
+    hover_data={"uf": True, "value_cause": False},
+    color="value_cause", 
+    size="value_cause", 
+    color_continuous_scale=px.colors.sequential.Viridis, 
+    size_max=15, 
+    zoom=2
 )
 
-view_state = pdk.ViewState(
-    latitude=-23.5505,
-    longitude=-46.6333,
-    zoom=5,
-    pitch=0, # Inclinação do mapa (0 = plano, 45 = inclinado, 60 = quase deitado, 90 = deitado)
-)
-
-tooltip = {
-    "html": "<b>UF:</b> {uf}<br/><b>Total:</b> {uf_count}<br/><b>Valor:</b> {value_cause:,.2f}",
-    "style": {
-        "backgroundColor": "steelblue",
-        "color": "red"
-    }
-}
-
-# Renderizando no Streamlit
-st.pydeck_chart(
-    pdk.Deck(
-        layers=layer,
-        initial_view_state=view_state,
-        tooltip=tooltip
+fig.update_traces(
+    hovertemplate="<br>".join(
+        [
+            "UF: %{customdata[0]}",
+            "Valor da causa: R$ %{customdata[1]:,.2f}",
+        ]
     )
 )
 
-st.write(tooltip)
+
+st.plotly_chart(fig)
+
+
+st.subheader("Total de processos por UF")
+# Gráfico de barras
+
+figBar = px.bar(
+    ufDf,
+    x="uf",
+    y="uf_count",
+    title="Total de processos por UF",
+    labels={"uf_count": "Total de processos", "uf": "UF"},
+    color="uf",
+    orientation="v",
+    text="uf_count",
+    category_orders={"uf_count": ufDf["uf_count"].tolist()}
+)
+
+figBar.update_traces(textposition='outside')
+
+st.plotly_chart(figBar)

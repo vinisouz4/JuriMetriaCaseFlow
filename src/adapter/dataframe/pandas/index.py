@@ -26,6 +26,9 @@ class PandasDataFrame():
             for i in column:
                 data[i] = pd.to_datetime(data[i], errors='coerce')
 
+                if data[i].dt.tz is not None:
+                    data[i] = data[i].dt.tz_convert(None)
+
             self.logger.INFO(f"Column converted to datetime")
             
             return data
