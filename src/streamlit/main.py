@@ -12,16 +12,17 @@ from src.use_case.insights.insights import Insights
 from src.use_case.dataCaseFlow.readData import ReadCaseFlowData
 from src.use_case.dataDataJud.readDataJud import ReadDataJud
 
+insights = Insights(PandasDataFrame())
+dataCaseFlow = ReadCaseFlowData(PandasDataFrame())
+dataJud = ReadDataJud(PandasDataFrame())
+
+
 st.title("Jurimetria")
 
 with st.sidebar:
     st.title("Filtros")
 
     filterNumberDays = st.number_input("Numero de Dias", min_value=7, max_value=100000)
-
-insights = Insights(PandasDataFrame())
-dataCaseFlow = ReadCaseFlowData(PandasDataFrame())
-dataJud = ReadDataJud(PandasDataFrame())
 
 # =============================================================================
 
@@ -195,3 +196,9 @@ acolhimentoEmbargosDeclarao.metric(
 # =============================================================================
 
 st.dataframe(groupedJud)
+
+allMoviments = dataJud.getAllMoviments().explode(["movimentos", "dataMovimentacao"])
+
+st.dataframe(allMoviments)
+
+st.dataframe(dataJud.meanDateProcess(allMoviments))

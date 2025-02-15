@@ -115,3 +115,74 @@ class ReadDataJud():
         except Exception as e:
             self.logger.ERROR(f"Error in statusCount: {e}")
             return None
+
+    def getAllMoviments(self):
+        try:
+
+            """
+            Metodo para buscar todas as movimentacoes e datas de cada movimentacao.
+            """
+
+            self.logger.INFO(f"Reading data from DataJud DataLake, Date: {self.utils.getToday()}")
+
+            dictData = json.load(
+                open(
+                    f"{self.settings.DATALAKE_URL}data_{self.utils.getToday()}.json", "r"
+                )
+            )
+
+            self.logger.INFO("Data read successfully")
+
+            processoFormatado =[]
+
+            for process in dictData:
+                for source in process["hits"]["hits"]:
+                    sources = source["_source"]
+                    processo = {
+                        "numeroProcesso": sources.get("numeroProcesso", ""),
+                        "dataAjuizamento": self.utils.formatar_data(sources.get("dataAjuizamento", "")),
+                    }
+
+                    movimentos_ordenados = sorted(
+                        sources.get("movimentos", []), 
+                        key=lambda x: x["dataHora"]
+                    )
+
+                    processo["movimentos"] = [mov["nome"] for mov in movimentos_ordenados]
+                    processo["dataMovimentacao"] = [self.utils.formatar_data(mov["dataHora"]) for mov in movimentos_ordenados]
+
+                    processoFormatado.append(processo)
+
+            df = self.dataframe.to_DataFrame(processoFormatado)
+
+            self.logger.INFO("Data transformed successfully")
+            
+            return df
+
+        except Exception as e:
+            self.logger.ERROR(f"Error in readDataJud: {e}")
+            return None
+
+    def meanDateProcess(self, df):
+        try:
+
+            """
+            Metodo para calcular a média de dias entre a data de ajuizamento e a data do ultimo movimento
+            """
+
+            self.logger.INFO("Starting meanDateProcess")
+
+            df["dataAjuizamento"] = self.dataframe.to_datetime(df, ["dataAjuizamento"])
+            # df["dataMovimentacao"] = self.dataframe.to_datetime(df, ["dataMovimentacao"])
+
+            # df["dias"] = (df["dataMovimentacao"] - df["dataAjuizamento"]).dt.days
+
+            # media = df["dias"].mean()
+
+            self.logger.INFO("Mean calculated successfully")
+
+            return df
+
+        except Exception as e:
+            self.logger.ERROR(f"Error in meanDateProcess: {e}")
+            return None
