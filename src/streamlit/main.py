@@ -11,18 +11,14 @@ from src.adapter.dataframe.pandas.index import PandasDataFrame
 from src.use_case.insights.insights import Insights
 from src.use_case.dataCaseFlow.readData import ReadCaseFlowData
 from src.use_case.dataDataJud.readDataJud import ReadDataJud
+from src.utils.utils import Utils
 
 insights = Insights(PandasDataFrame())
 dataCaseFlow = ReadCaseFlowData(PandasDataFrame())
 dataJud = ReadDataJud(PandasDataFrame())
-
+util = Utils()
 
 st.title("Jurimetria")
-
-with st.sidebar:
-    st.title("Filtros")
-
-    filterNumberDays = st.number_input("Numero de Dias", min_value=7, max_value=100000)
 
 # =============================================================================
 
@@ -33,6 +29,15 @@ df = dataJud.readDataJud()
 groupedJud = dataJud.statusGrouped(df)
 
 # =============================================================================
+
+with st.sidebar:
+    st.title("Filtros")
+
+    filterNumberDays = st.number_input("Numero de Dias", min_value=7, max_value=100000)
+
+    numberProcess = st.text_input("Numero do Processos", placeholder="Digite o numero de processos sem pontos e traços")
+
+    month = st.selectbox("Mês", ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"])
 
 # =============================================================================
 
@@ -199,6 +204,6 @@ st.dataframe(groupedJud)
 
 allMoviments = dataJud.getAllMoviments().explode(["movimentos", "dataMovimentacao"])
 
-st.dataframe(allMoviments)
+st.dataframe(dataJud.meanDateProcess(allMoviments, numberProcess))
 
-st.dataframe(dataJud.meanDateProcess(allMoviments))
+st.dataframe(insights.newProcessMonth(dataCase, month=util.getNumberMonth(month)))

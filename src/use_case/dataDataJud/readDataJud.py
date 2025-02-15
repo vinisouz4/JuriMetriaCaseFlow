@@ -163,7 +163,7 @@ class ReadDataJud():
             self.logger.ERROR(f"Error in readDataJud: {e}")
             return None
 
-    def meanDateProcess(self, df):
+    def meanDateProcess(self, df, numberProcess: str = None):
         try:
 
             """
@@ -172,17 +172,43 @@ class ReadDataJud():
 
             self.logger.INFO("Starting meanDateProcess")
 
-            df["dataAjuizamento"] = self.dataframe.to_datetime(df, ["dataAjuizamento"])
-            # df["dataMovimentacao"] = self.dataframe.to_datetime(df, ["dataMovimentacao"])
+            df = self.dataframe.to_datetime(df, ["dataAjuizamento", "dataMovimentacao"])
 
-            # df["dias"] = (df["dataMovimentacao"] - df["dataAjuizamento"]).dt.days
+            df_ultima_mov = df.groupby('numeroProcesso')['dataMovimentacao'].max().reset_index()
 
-            # media = df["dias"].mean()
+            df = df.merge(df_ultima_mov, on='numeroProcesso', suffixes=('', '_ultima'))
 
-            self.logger.INFO("Mean calculated successfully")
+            # Contar o número de movimentações por processo
+            num_movimentacoes = df.groupby('numeroProcesso')['dataMovimentacao'].count().reset_index()
+            num_movimentacoes.rename(columns={'dataMovimentacao': 'numMovimentacoes'}, inplace=True)
 
-            return df
+            # Juntar com o DataFrame original
+            df = df.merge(num_movimentacoes, on='numeroProcesso')
 
+            # Calcular o tempo total de tramitação (diferença entre a última movimentação e o ajuizamento)
+            df['tempoTotalTramitacao'] = df['dataMovimentacao_ultima'] - df['dataAjuizamento']
+
+            # Calcular o tempo médio entre movimentações
+            df['tempoMedioMovimentacao'] = df['tempoTotalTramitacao'] / df['numMovimentacoes']
+
+            # Remover duplicatas, pois o explode pode ter repetido processos
+            df = df.drop_duplicates(subset=['numeroProcesso']).reset_index(drop=True)
+
+            df['tempoTotalTramitacao'] = df['tempoTotalTramitacao'].dt.round("s")
+            df['tempoMedioMovimentacao'] = df['tempoMedioMovimentacao'].dt.round("s")
+
+            self.logger.INFO(f"retorno param: {numberProcess}")
+
+            if numberProcess is not None and numberProcess != "":
+                df = df[df["numeroProcesso"] == numberProcess]
+
+                self.logger.INFO("Mean calculated successfully")
+                return df[['numeroProcesso', "dataAjuizamento", "numMovimentacoes", 'tempoTotalTramitacao', 'tempoMedioMovimentacao']]
+            
+            else:
+                self.logger.INFO("Mean calculated successfully")
+                return df[['numeroProcesso', "dataAjuizamento", "numMovimentacoes", 'tempoTotalTramitacao', 'tempoMedioMovimentacao']]
+            
         except Exception as e:
             self.logger.ERROR(f"Error in meanDateProcess: {e}")
             return None

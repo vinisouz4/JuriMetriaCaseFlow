@@ -105,3 +105,32 @@ class Insights():
         except Exception as e:
             self.logger.ERROR(f"Error in totalUf: {e}")
             return None
+
+    def newProcessMonth(self, df, month: int):
+        try:
+
+            """
+            Método para calcular a quantidade de processos novos por mes e ano
+            """
+
+            self.logger.INFO("Started calculating new process month")
+
+            df["month"] = df["distribution_date"].dt.month
+            df["year"] = df["distribution_date"].dt.year
+
+            agg = {
+                'process_number': 'count'
+            }
+
+            groupbyData = self.dataframe.groupby(df, ['month', 'year'], agg)
+
+            groupbyData = groupbyData.sort_values(by=["year", "month"], ascending=False)
+
+            groupbyData = groupbyData[(groupbyData["month"] == month)]
+
+            self.logger.INFO(f"New process month: {groupbyData}")
+
+            return groupbyData
+        except Exception as e:
+            self.logger.ERROR(f"Error in newProcessMonth: {e}")
+            return None
