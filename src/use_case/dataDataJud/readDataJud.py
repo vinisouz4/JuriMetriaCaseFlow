@@ -27,27 +27,35 @@ class ReadDataJud():
 
             dictData = json.load(
                 open(
-                    f"{self.settings.DATALAKE_URL}data_{self.utils.getToday()}.json", "r"
+                    f"{self.settings.DATALAKE_URL}data_{self.utils.getToday().month}_{self.utils.getToday().year}.json", "r"
                 )
             )
 
             self.logger.INFO("Data read successfully")
 
             resultado = []
+            notFound = []
 
             for process in dictData:
-                for source in process["hits"]["hits"]:
-                    movimentos = source["_source"]["movimentos"]
-                    ultimo_movimento = max(movimentos, key=lambda x: datetime.strptime(x["dataHora"], "%Y-%m-%dT%H:%M:%S.%fZ"))
+                if process["data"]["hits"]["hits"] == []:
+                    notFound.append({
+                        "processo": process["processo"],
+                        "hits": 0
+                    })
+                else:
+                    for source in process["data"]["hits"]["hits"]:
+                        movimentos = source["_source"].get("movimentos", [])
+                        if movimentos:
+                            ultimo_movimento = max(movimentos, key=lambda x: datetime.strptime(x["dataHora"], "%Y-%m-%dT%H:%M:%S.%fZ"))
 
-                    results = {
-                        "processo": source["_source"]["numeroProcesso"],
-                        "dataAjuizamento": source["_source"]["dataAjuizamento"],
-                        "dataUltimoMovimento": ultimo_movimento["dataHora"],
-                        "movimento": ultimo_movimento["nome"]
-                    }
+                            results = {
+                                "processo": source["_source"]["numeroProcesso"],
+                                "dataAjuizamento": source["_source"]["dataAjuizamento"],
+                                "dataUltimoMovimento": ultimo_movimento["dataHora"],
+                                "movimento": ultimo_movimento["nome"]
+                            }
 
-                    resultado.append(results)
+                            resultado.append(results)
 
 
             self.logger.INFO("Transforming data to DataFrame")
@@ -56,14 +64,16 @@ class ReadDataJud():
 
             df = self.dataframe.to_datetime(df, ["dataUltimoMovimento"])
 
+            dfNotFound = self.dataframe.to_DataFrame(notFound)
+
             self.logger.INFO("Data transformed successfully")
 
-            return df
+            return df, dfNotFound
 
         except Exception as e:
             self.logger.ERROR(f"Error in readDataJud: {e}")
             return None
-        
+
     def statusGrouped(self, df):
         try:
             self.logger.INFO("Starting statusGrouped")
@@ -94,7 +104,7 @@ class ReadDataJud():
             self.logger.INFO("Starting statusCount")
 
             data = self.dataframe.to_datetime(
-                df, 
+                df,
                 [dateColumn]
             )
 
@@ -104,7 +114,7 @@ class ReadDataJud():
 
             # Aplicar o filtro de range de data e status
             data = df[
-                (df[dateColumn] >= rangeDays) & 
+                (df[dateColumn] >= rangeDays) &
                 (df["movimento"] == status)
             ].shape[0]
 
@@ -127,7 +137,7 @@ class ReadDataJud():
 
             dictData = json.load(
                 open(
-                    f"{self.settings.DATALAKE_URL}data_{self.utils.getToday()}.json", "r"
+                    f"{self.settings.DATALAKE_URL}data_{self.utils.getToday().month}_{self.utils.getToday().year}.json", "r"
                 )
             )
 
@@ -136,7 +146,7 @@ class ReadDataJud():
             processoFormatado =[]
 
             for process in dictData:
-                for source in process["hits"]["hits"]:
+                for source in process["data"]["hits"]["hits"]:
                     sources = source["_source"]
                     processo = {
                         "numeroProcesso": sources.get("numeroProcesso", ""),
@@ -144,7 +154,7 @@ class ReadDataJud():
                     }
 
                     movimentos_ordenados = sorted(
-                        sources.get("movimentos", []), 
+                        sources.get("movimentos", []),
                         key=lambda x: x["dataHora"]
                     )
 
@@ -156,7 +166,7 @@ class ReadDataJud():
             df = self.dataframe.to_DataFrame(processoFormatado)
 
             self.logger.INFO("Data transformed successfully")
-            
+
             return df
 
         except Exception as e:
@@ -204,11 +214,11 @@ class ReadDataJud():
 
                 self.logger.INFO("Mean calculated successfully")
                 return df[['numeroProcesso', "dataAjuizamento", "numMovimentacoes", 'tempoTotalTramitacao', 'tempoMedioMovimentacao']]
-            
+
             else:
                 self.logger.INFO("Mean calculated successfully")
                 return df[['numeroProcesso', "dataAjuizamento", "numMovimentacoes", 'tempoTotalTramitacao', 'tempoMedioMovimentacao']]
-            
+
         except Exception as e:
             self.logger.ERROR(f"Error in meanDateProcess: {e}")
             return None

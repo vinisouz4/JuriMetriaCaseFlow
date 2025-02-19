@@ -34,7 +34,7 @@ class Requests():
             async with session.get(url, headers=headers, data=payload) as response:
                 if response.status == 200:
                     data = await response.json()
-                    return data
+                    return {"processo": processNumber, "data": data}
                 
                 else:
                     self.logger.ERROR(f"Error getting data from url: {response.status}")

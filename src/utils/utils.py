@@ -107,7 +107,6 @@ class Utils():
             return None, None
 
     def formatar_data(self,data_src):
-        self.logger.INFO(f"Formatting date: {data_src}")
         return data_src.replace("T", " ").replace("Z", "")
     
     def getNumberMonth(self, month):

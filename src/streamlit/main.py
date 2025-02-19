@@ -24,9 +24,9 @@ st.title("Jurimetria")
 
 dataCase = dataCaseFlow.getData("Case", "true")
 
-df = dataJud.readDataJud()
+dfFound, dfNotFound = dataJud.readDataJud()
 
-groupedJud = dataJud.statusGrouped(df)
+groupedJud = dataJud.statusGrouped(dfFound)
 
 # =============================================================================
 
@@ -65,7 +65,7 @@ peticao, distribuicao, conclusao, meroExpedientePublicao = st.columns(4)
 peticao.metric(
     f"Petição - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "Petição", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -76,7 +76,7 @@ peticao.metric(
 distribuicao.metric(
     f"Distribuição - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "Distribuição", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -87,7 +87,7 @@ distribuicao.metric(
 conclusao.metric(
     f"Conclusão - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "Conclusão", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -98,7 +98,7 @@ conclusao.metric(
 meroExpedientePublicao.metric(
     f"Mero Expediente e publicação - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "Mero Expediente e publicação", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -116,7 +116,7 @@ dependerJulgamento, instrucao, retiradaPauta = st.columns(3)
 dependerJulgamento.metric(
     f"A depender do julgamento - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "A depender do julgamento", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -127,7 +127,7 @@ dependerJulgamento.metric(
 instrucao.metric(
     f"de Instrução - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "de Instrução", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -138,7 +138,7 @@ instrucao.metric(
 retiradaPauta.metric(
     f"Retirada de pauta - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "Retirada de pauta", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -155,7 +155,7 @@ decisaoJudicial, baixaDefinitiva, definitivo, acolhimentoEmbargosDeclarao = st.c
 decisaoJudicial.metric(
     f"Por decisão judicial - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "Por decisão judicial", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -166,7 +166,7 @@ decisaoJudicial.metric(
 baixaDefinitiva.metric(
     f"Baixa Definitiva - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "Baixa Definitiva", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -177,7 +177,7 @@ baixaDefinitiva.metric(
 definitivo.metric(
     f"Definitivo - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "Definitivo", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -188,7 +188,7 @@ definitivo.metric(
 acolhimentoEmbargosDeclarao.metric(
     f"Não acolhimento de embargos de declaração - {filterNumberDays} Dias", 
     dataJud.statusCount(
-        df, 
+        dfFound, 
         "Não acolhimento de embargos de declaração", 
         "dataUltimoMovimento", 
         filterNumberDays
@@ -201,6 +201,9 @@ acolhimentoEmbargosDeclarao.metric(
 # =============================================================================
 
 st.dataframe(groupedJud)
+
+st.write("Processos não encontrados")
+st.dataframe(dfNotFound)
 
 allMoviments = dataJud.getAllMoviments().explode(["movimentos", "dataMovimentacao"])
 
