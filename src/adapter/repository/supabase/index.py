@@ -68,3 +68,26 @@ class Supabase():
             self.logger.ERROR(f"Error getting data from Supabase: {e}")
     
 
+    def getBucket(self, bucket: str) -> list:
+        try:
+
+            """
+            Parameters: 
+            - bucket (str): Nome do bucket;
+
+            Returns:
+            - data (list): Lista de dicionários com os dados do bucket selecionado.
+            """
+
+            client = self.__connect()
+            
+            self.logger.INFO(f"Getting data from bucket: {bucket}")
+            
+            data = client.storage.from_(bucket).list()
+            
+            self.logger.INFO(f"Data from bucket {bucket} retrieved successfully")
+            
+            return data
+        
+        except Exception as e:
+            self.logger.ERROR(f"Error getting data from bucket: {e}")

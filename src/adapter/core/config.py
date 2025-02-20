@@ -16,6 +16,8 @@ class Settings():
 
         DATALAKE_URL = os.getenv("DATALAKE_URL")
 
+        ESCAVADOR_KEY = os.getenv("ESCAVADOR_KEY")
+
     except Exception as e:
         API_SUPABASE_URL = None
         API_SUPABASE_KEY = None

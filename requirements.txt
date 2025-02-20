@@ -9,3 +9,4 @@ openpyxl
 polars
 certifi
 plotly
+escavador
