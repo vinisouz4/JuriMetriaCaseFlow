@@ -1,10 +1,29 @@
 # Dicionário de mapeamento
 tribunal_map = {
-    'Diário Eletrônico da Justiça do Trabalho (TRT-2)': "2",
-    'Tribunal Regional do Trabalho da 2ª Região': "2",
-    'Tribunal Regional do Trabalho da 15ª Região': "15",
-    'Tribunal Regional do Trabalho da 2ª Região (TRT2) - SP': "2",
-    'Tribunal Regional do Trabalho da 15ª Região (TRT15) - SP': "15"
+    'TRT-1': "1",
+    'TRT-2': "2",
+    'TRT-3': "3",
+    'TRT-4': "4",
+    'TRT-5': "5",
+    'TRT-6': "6",
+    'TRT-7': "7",
+    'TRT-8': "8",
+    'TRT-9': "9",
+    'TRT-10': "10",
+    'TRT-11': "11",
+    'TRT-12': "12",
+    'TRT-13': "13",
+    'TRT-14': "14",
+    'TRT-15': "15",
+    'TRT-16': "16",
+    'TRT-17': "17",
+    'TRT-18': "18",
+    'TRT-19': "19",
+    'TRT-20': "20",
+    'TRT-21': "21",
+    'TRT-22': "22",
+    'TRT-23': "23",
+    'TRT-24': "24"
 }
 
 # Função para obter o número do tribunal

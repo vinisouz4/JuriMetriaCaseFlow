@@ -68,7 +68,7 @@ class Supabase():
             self.logger.ERROR(f"Error getting data from Supabase: {e}")
     
 
-    def getBucket(self, bucket: str) -> list:
+    def getBucket(self, bucket: str = None) -> list:
         try:
 
             """
@@ -83,7 +83,7 @@ class Supabase():
             
             self.logger.INFO(f"Getting data from bucket: {bucket}")
             
-            data = client.storage.from_(bucket).list()
+            data = client.storage.list_buckets()
             
             self.logger.INFO(f"Data from bucket {bucket} retrieved successfully")
             
