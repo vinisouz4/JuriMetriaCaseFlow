@@ -7,7 +7,6 @@ import ssl
 
 from src.adapter.logging.logging import LoggerHandler
 from src.utils.utils import Utils
-from src.use_case.tribunais.tribunais import getTribunalNumber
 
 
 class Requests():
@@ -62,7 +61,7 @@ class Requests():
             
             self.logger.INFO(f"Getting data from url: {url}")
 
-            dfgrouped = processNumber.groupby("endpoint_tribunal")["external_number"].apply(list).reset_index()
+            dfgrouped = processNumber.groupby(["endpoint", "typeTribunal"])["numeroProcessoFormated"].apply(list).reset_index()
 
             responses = []
 
@@ -73,11 +72,12 @@ class Requests():
                 tasks = []
 
                 for index, row in dfgrouped.iterrows():
-                    self.logger.DEBUG(f"Endpoint: {row['endpoint_tribunal']}")
-                    endpoint = row["endpoint_tribunal"]
-                    numberProcess = row["external_number"]
+                    self.logger.DEBUG(f"Endpoint: {row['endpoint']}")
+                    endpoint = row["endpoint"]
+                    numberProcess = row["numeroProcessoFormated"]
+                    typeTribunal = row["typeTribunal"]
                     
-                    newUrl = url + f"api_publica_trt{endpoint}/_search"
+                    newUrl = url + f"api_publica_{typeTribunal}{endpoint}/_search"
 
                     self.logger.INFO(f"Data from url: {newUrl} retrieved successfully")
 

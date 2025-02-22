@@ -40,11 +40,6 @@ class getDataJud():
 
         try:
             self.logger.INFO("Starting saving data")
-            
-            # Retirar isso depois da aprovacao do projeto
-            # df = df[df["client_id"].isin([13, 30, 1248]) & df["uf"].isin(["SP"])]
-
-            df["endpoint_tribunal"] = df["tribunal_justica"].apply(getTribunalNumber)
 
             # Após validacao, salvar os dados dentro de um data lake na nuvem ou fisico
             with open(f"./src/data/lake/data_{self.util.getToday().month}_{self.util.getToday().year}.json", "w") as f:

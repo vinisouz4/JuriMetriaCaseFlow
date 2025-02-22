@@ -26,6 +26,12 @@ class ReadEscavador():
             )
 
             df = self.dataframe.to_DataFrame(dictData)
+
+            df["typeTribunal"] = df["tribunal"].str.split("-").str[0].str.lower()
+            df["endpoint"] = df["tribunal"].str.split("-").str[1]
+
+            df["numeroProcessoFormated"] = df["numeroProcesso"].apply(self.dataframe.removeSpecialCharacters)
+
             self.logger.INFO("Data read successfully")
             
             self.logger.INFO("Data from Escavador loaded")
@@ -34,3 +40,69 @@ class ReadEscavador():
             self.logger.ERROR(f"Error getting data from Escavador: {e}")
             return None
         
+    def processAtivoPassivo(self, df, processNumber: str = None):
+        try:
+
+            """
+            Método para buscar quem são os polos ativos e passivos e retornar os dois polos.
+            """
+
+            self.logger.INFO("Processing data from Escavador")
+            
+            if processNumber is None or processNumber == "":
+                self.logger.INFO("Filtering data by process number: None")
+                return "Informar o número do processo", "Informar o número do processo"
+            
+            else:
+                self.logger.INFO(f"Filtering data by process number: {processNumber}")
+                
+                df = df[df["numeroProcessoFormated"] == processNumber]
+
+                return df["poloAtivo"].values[0], df["poloPassivo"].values[0]
+
+        except Exception as e:
+            self.logger.ERROR(f"Error processing data from Escavador: {e}")
+            return None
+        
+    def totalTribunal(self, df, processNumber: str = None, tribunal: list = None, client: str = None):
+        try:
+            self.logger.INFO("Getting total of tribunals")
+
+            if tribunal is not None and tribunal != []:
+                self.logger.INFO(f"Filtering data by tribunal: {tribunal}")
+                df = df[
+                    df["tribunal"].isin(tribunal)
+                ]
+
+                dfGrouped = df.groupby('tribunal').size().reset_index(name='Total')
+
+                dfGrouped.rename(
+                    columns={
+                        "tribunal": "Tribunal"
+                    }, 
+                    inplace=True
+                )
+                
+                self.logger.INFO("Total of tribunals counted successfully")    
+                
+                return dfGrouped
+            
+            else:
+                self.logger.INFO("No filter by tribunal")
+
+                dfGrouped = df.groupby('tribunal').size().reset_index(name='Total')
+
+                dfGrouped.rename(
+                    columns={
+                        "tribunal": "Tribunal"
+                    }, 
+                    inplace=True
+                )
+
+                self.logger.INFO("Total of tribunals counted successfully")
+
+                return dfGrouped
+            
+        except Exception as e:
+            self.logger.ERROR(f"Error getting total of tribunals: {e}")
+            return None

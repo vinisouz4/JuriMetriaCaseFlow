@@ -46,7 +46,7 @@ class Insights():
             self.logger.ERROR(f"Error in totalValueCause: {e}")
             return None
 
-    def distributionData(self, df, dateColumn):
+    def distributionData(self, df, dateColumn) -> int:
         try:
 
             """
@@ -71,7 +71,7 @@ class Insights():
 
             self.logger.INFO(f"Total process distributed in the last 30 days: {thirtyDaysProcess} and in the last 7 days: {sevenDaysProcess}")
             
-            return thirtyDaysProcess, sevenDaysProcess
+            return thirtyDaysProcess
         except Exception as e:
             self.logger.ERROR(f"Error in distributionData: {e}")
             return None

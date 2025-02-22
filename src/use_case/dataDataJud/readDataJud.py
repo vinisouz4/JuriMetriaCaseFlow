@@ -74,58 +74,6 @@ class ReadDataJud():
             self.logger.ERROR(f"Error in readDataJud: {e}")
             return None
 
-    def statusGrouped(self, df):
-        try:
-            self.logger.INFO("Starting statusGrouped")
-
-            dfGrouped = self.dataframe.groupby(df, ["movimento"], {"processo": "count"})
-
-            self.logger.INFO("Status grouped successfully")
-
-            return dfGrouped
-
-        except Exception as e:
-            self.logger.ERROR(f"Error in statusGrouped: {e}")
-            return None
-
-    def statusCount(self, df, status: str, dateColumn: str, qtdDays: int):
-        try:
-
-            """
-            Método para contar a quantidade de processos por status dentro do range de datas
-            Desde a distribuição até a data atual
-            Parâmetros:
-            df: DataFrame
-            status: Qual status deseja contar
-            dateColumn: Coluna de data do DataFrame, no caso ideal considerar a coluna de distribuição (por enquanto)
-            qtdDays: Quantidade de dias que deseja verificar a contagem (Exemplo: 30 dias, 7 dias)
-            """
-
-            self.logger.INFO("Starting statusCount")
-
-            data = self.dataframe.to_datetime(
-                df,
-                [dateColumn]
-            )
-
-            today = self.utils.getToday()
-
-            rangeDays = self.dataframe.getPastDate(qtdDays, today)
-
-            # Aplicar o filtro de range de data e status
-            data = df[
-                (df[dateColumn] >= rangeDays) &
-                (df["movimento"] == status)
-            ].shape[0]
-
-            self.logger.INFO(f"Status {status} counted successfully")
-
-            return data
-
-        except Exception as e:
-            self.logger.ERROR(f"Error in statusCount: {e}")
-            return None
-
     def getAllMoviments(self):
         try:
 
@@ -172,6 +120,41 @@ class ReadDataJud():
         except Exception as e:
             self.logger.ERROR(f"Error in readDataJud: {e}")
             return None
+        
+    def totalStatus(self, df, numberProcess: str = None):
+        try:
+
+            """
+            Método para contar a quantidade de processos por status
+            """
+
+            self.logger.INFO("Starting totalStatus")
+
+            if numberProcess is not None and numberProcess != "":
+                self.logger.INFO(f"Filtering data by process number: {numberProcess}")
+                
+                df = df[
+                    df["numeroProcesso"] == numberProcess
+                ]
+                
+                data = df.groupby('movimentos').size().reset_index(name='total')
+                
+                self.logger.INFO("Status counted successfully")
+                
+                return data
+
+            else:
+                self.logger.INFO("Filtering data by process number: None")
+
+                data = df.groupby('movimentos').size().reset_index(name='total')
+
+                self.logger.INFO("Status counted successfully")
+
+                return data
+
+        except Exception as e:
+            self.logger.ERROR(f"Error in totalStatus: {e}")
+            return None
 
     def meanDateProcess(self, df, numberProcess: str = None):
         try:
@@ -210,6 +193,7 @@ class ReadDataJud():
             self.logger.INFO(f"retorno param: {numberProcess}")
 
             if numberProcess is not None and numberProcess != "":
+                self.logger.INFO(f"Calculating mean by process number: {numberProcess}")
                 df = df[df["numeroProcesso"] == numberProcess]
 
                 self.logger.INFO("Mean calculated successfully")
