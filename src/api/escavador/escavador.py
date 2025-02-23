@@ -64,26 +64,8 @@ class apiEscavador():
                     "anoInicio": processo.ano_inicio,
                     "quantidadeMovimentacao": processo.quantidade_movimentacoes,
                     "dataUltimaMovimentacao": processo.data_ultima_movimentacao,
-                    "poloAtivo": [
-                        {
-                            "nome": envolvido.nome, 
-                            "tipo": envolvido.tipo, 
-                            "cpf": envolvido.cpf, 
-                            "cnpj": envolvido.cnpj,
-                            "quantidadeProcesso": envolvido.quantidade_processos,
-                        }
-                        for envolvido in processo.fontes[0].envolvidos if envolvido.polo == "ATIVO"
-                    ],
-                    "poloPassivo": [
-                        {
-                            "nome": envolvido.nome, 
-                            "tipo": envolvido.tipo, 
-                            "cpf": envolvido.cpf, 
-                            "cnpj": envolvido.cnpj,
-                            "quantidadeProcesso": envolvido.quantidade_processos,
-                        }
-                        for envolvido in processo.fontes[0].envolvidos if envolvido.polo == "PASSIVO"
-                    ],
+                    "poloAtivo": processo.titulo_polo_ativo,
+                    "poloPassivo": processo.titulo_polo_passivo,
                     "dataInicio": processo.data_inicio,
                     "tribunal": processo.fontes[0].sigla,
                     "tipo": processo.fontes[0].capa.area,

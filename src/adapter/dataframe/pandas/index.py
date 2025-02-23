@@ -13,6 +13,12 @@ class PandasDataFrame():
         
         return pd.read_csv(path)
     
+    def DataFrame(self, data: dict) -> pd.DataFrame:
+        
+        self.logger.INFO(f"Converting data to DataFrame")
+        
+        return pd.DataFrame(data)
+    
     def to_DataFrame(self, data: list) -> pd.DataFrame:
         
         self.logger.INFO(f"Converting data to DataFrame")
@@ -106,4 +112,44 @@ class PandasDataFrame():
             return value
         except Exception as e:
             self.logger.ERROR(f"Error in removeSpecialCharacters: {e}")
+            return None
+        
+    def merge(self, df1, df2, left_on: list, right_on: list, how: str) -> pd.DataFrame:
+        try:
+            """
+            Parameters:
+            df1: pd.DataFrame - First DataFrame to merge
+            df2: pd.DataFrame - Second DataFrame to merge
+            on: str - Column to merge
+            """
+
+            self.logger.INFO(f"Merging dataframes")
+
+            data = pd.merge(df1, df2, left_on=left_on, right_on=right_on, how=how)
+
+            self.logger.INFO("Dataframes merged successfully")
+            
+            return data
+        except Exception as e:
+            self.logger.ERROR(f"Error in merge: {e}")
+            return None
+        
+    def concat(self, df1, df2, axis) -> pd.DataFrame:
+        try:
+            """
+            Parameters:
+            df1: pd.DataFrame - First DataFrame to concat
+            df2: pd.DataFrame - Second DataFrame to concat
+            axis: int - Axis to concat
+            """
+
+            self.logger.INFO(f"Concatenating dataframes")
+
+            data = pd.concat([df1, df2], axis=axis)
+
+            self.logger.INFO("Dataframes concatenated successfully")
+            
+            return data
+        except Exception as e:
+            self.logger.ERROR(f"Error in concat: {e}")
             return None

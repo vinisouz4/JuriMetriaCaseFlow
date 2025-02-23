@@ -1,6 +1,7 @@
 
 import json
 from datetime import datetime
+from itertools import product
 
 
 from src.adapter.core.config import Settings
@@ -62,7 +63,7 @@ class ReadDataJud():
 
             df = self.dataframe.to_DataFrame(resultado)
 
-            df = self.dataframe.to_datetime(df, ["dataUltimoMovimento"])
+            df = self.dataframe.to_datetime(df, ["dataUltimoMovimento", "dataAjuizamento"])
 
             dfNotFound = self.dataframe.to_DataFrame(notFound)
 
@@ -205,4 +206,83 @@ class ReadDataJud():
 
         except Exception as e:
             self.logger.ERROR(f"Error in meanDateProcess: {e}")
+            return None
+
+    def processNewAndCloset(self, df):
+        try:
+
+            """
+            Metodo para calcular a quantidade de processos novos e encerrados por mes e ano
+            df -> Dataframe do datajud apenas com a data de ajuizamento e a data do ultimo movimento e os status
+            """
+
+            self.logger.INFO("Starting processNewAndCloset")
+
+            df = self.dataframe.to_datetime(df, ["dataAjuizamento", "dataUltimoMovimento"])
+
+            anos = range(df["dataAjuizamento"].map(lambda x: x.year).min(), self.utils.getToday().year + 1)
+            meses = range(1, 13)
+
+            combinacoes = list(product(anos, meses))
+
+            # Criar um DataFrame de Calendário
+
+            calendario = self.dataframe.DataFrame({
+                "ano": [ano for ano, mes in combinacoes],
+                "mes": [mes for ano, mes in combinacoes]
+            })
+
+            df["status"] = df["movimento"].apply(lambda x: "Encerrado" if "Baixa Definitiva" in x or "Definitivo" in x else "Novo")
+
+            df["mesAjuizamento"] = df["dataAjuizamento"].dt.month
+            df["anoAjuizamento"] = df["dataAjuizamento"].dt.year
+            df["mesUltimoMovimento"] = df["dataUltimoMovimento"].dt.month
+            df["anoUltimoMovimento"] = df["dataUltimoMovimento"].dt.year
+
+            novos = df[df["status"] != "Encerrado"].groupby(["anoAjuizamento", "mesAjuizamento"]).size().reset_index(name="Novos")
+            
+
+            encerrados = df[df["status"] == "Encerrado"].groupby(["anoUltimoMovimento", "mesUltimoMovimento"]).size().reset_index(name="Encerrados")
+
+            resultadoNovos = self.dataframe.merge(
+                calendario, 
+                novos, 
+                left_on=["ano", "mes"], 
+                right_on=["anoAjuizamento", "mesAjuizamento"], 
+                how="outer"
+            )
+            
+            resultadoNovos = resultadoNovos.drop(
+                columns=["anoAjuizamento", "mesAjuizamento"]
+            )
+
+            resultadoEncerrados = self.dataframe.merge(
+                calendario, 
+                encerrados, 
+                left_on=["ano", "mes"], 
+                right_on=["anoUltimoMovimento", "mesUltimoMovimento"], 
+                how="outer"
+            )
+            
+            resultadoEncerrados = resultadoEncerrados.drop(
+                columns=["anoUltimoMovimento", "mesUltimoMovimento"]
+            )
+
+            resultadoFinal = self.dataframe.merge(
+                resultadoNovos, 
+                resultadoEncerrados, 
+                left_on=["ano", "mes"], 
+                right_on=["ano", "mes"], 
+                how="outer"
+            )
+            
+            resultadoFinal = resultadoFinal.fillna(0)
+            
+
+            self.logger.INFO("Process calculated successfully")
+
+            return resultadoFinal
+
+        except Exception as e:
+            self.logger.ERROR(f"Error in processNewAndCloset: {e}")
             return None

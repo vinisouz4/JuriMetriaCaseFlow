@@ -31,3 +31,15 @@ class IDataFrameAdapter(abc.ABC):
     @abc.abstractmethod
     def removeSpecialCharacters(self, value: str) -> str:
         pass
+
+    @abc.abstractmethod
+    def DataFrame(self, data: dict):
+        pass
+
+    @abc.abstractmethod
+    def merge(self, df1, df2, left_on: list, right_on: list, how: str):
+        pass
+
+    @abc.abstractmethod
+    def concat(self, df1, df2, axis):
+        pass

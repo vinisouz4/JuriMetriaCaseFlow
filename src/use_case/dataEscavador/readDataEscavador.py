@@ -27,41 +27,60 @@ class ReadEscavador():
 
             df = self.dataframe.to_DataFrame(dictData)
 
-            # Inicializa as colunas como strings vazias
-            df["poloAtivoNome"] = ""
-            df["poloAtivoTipo"] = ""
-            df["poloAtivoCPF"] = ""
-            df["poloAtivoCNPJ"] = ""
+            # # Inicializa as colunas como strings vazias
+            # df["poloAtivoNome"] = ""
+            # df["poloAtivoTipo"] = ""
+            # df["poloAtivoCPF"] = ""
+            # df["poloAtivoCNPJ"] = ""
 
-            df["poloPassivoNome"] = ""
-            df["poloPassivoTipo"] = ""
-            df["poloPassivoCPF"] = ""
-            df["poloPassivoCNPJ"] = ""
+            # df["poloPassivoNome"] = ""
+            # df["poloPassivoTipo"] = ""
+            # df["poloPassivoCPF"] = ""
+            # df["poloPassivoCNPJ"] = ""
 
-            # Itera sobre a lista de dicionários
-            for item in dictData:
-                if "poloAtivo" in item:
-                    self.logger.INFO(f"Processing data from process number: {item['numeroProcesso']}")
-                    nomesAtivo = []
-                    tiposAtivo = []
-                    cpfsAtivo = []
-                    cnpjsAtivo = []
+            # # Itera sobre a lista de dicionários
+            # for item in dictData:
+            #     if "poloAtivo" in item:
+            #         self.logger.INFO(f"Processing data from process number: {item['numeroProcesso']}")
+            #         nomesAtivo = []
+            #         tiposAtivo = []
+            #         cpfsAtivo = []
+            #         cnpjsAtivo = []
 
-                    # Itera sobre os envolvidos no polo ativo
-                    for envolvido in item["poloAtivo"]:
-                        self.logger.INFO(f"Processing data from envolved: {envolvido.get('nome', '')}")
-                        nomesAtivo.append(envolvido.get("nome", ""))
-                        tiposAtivo.append(envolvido.get("tipo", ""))
-                        self.logger.INFO(f"CPF: {envolvido.get('cpf', '')}")
-                        cpfsAtivo.append(envolvido.get("cpf", ""))
-                        self.logger.INFO(f"CPF: {envolvido.get('cnpj', '')}")
-                        cnpjsAtivo.append(envolvido.get("cnpj", ""))
+            #         # Itera sobre os envolvidos no polo ativo
+            #         for envolvido in item["poloAtivo"]:
+            #             self.logger.INFO(f"Processing data from envolved: {envolvido.get('nome', '')}")
+            #             nomesAtivo.append(envolvido.get("nome", "") or "")
+            #             tiposAtivo.append(envolvido.get("tipo", "") or "")
+            #             cpfsAtivo.append(envolvido.get("cpf", "") or "")
+            #             cnpjsAtivo.append(envolvido.get("cnpj", "") or "")
 
-                    # Atualiza as colunas com os valores concatenados
-                    df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoNome"] = ", ".join(nomesAtivo)
-                    df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoTipo"] = ", ".join(tiposAtivo)
-                    df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoCPF"] = ", ".join(cpfsAtivo)
-                    df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoCNPJ"] = ", ".join(cnpjsAtivo)
+            #         # Atualiza as colunas com os valores concatenados
+            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoNome"] = ", ".join(nomesAtivo)
+            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoTipo"] = ", ".join(tiposAtivo)
+            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoCPF"] = ", ".join(cpfsAtivo)
+            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoCNPJ"] = ", ".join(cnpjsAtivo)
+
+            #     if "poloPassivo" in item:
+            #         self.logger.INFO(f"Processing data from process number: {item['numeroProcesso']}")
+            #         nomesPassivo = []
+            #         tiposPassivo = []
+            #         cpfsPassivo = []
+            #         cnpjsPassivo = []
+
+            #         # Itera sobre os envolvidos no polo passivo
+            #         for envolvido in item["poloPassivo"]:
+            #             self.logger.INFO(f"Processing data from envolved: {envolvido.get('nome', '')}")
+            #             nomesPassivo.append(envolvido.get("nome", "") or "")
+            #             tiposPassivo.append(envolvido.get("tipo", "") or "")
+            #             cpfsPassivo.append(envolvido.get("cpf", "") or "")
+            #             cnpjsPassivo.append(envolvido.get("cnpj", "") or "")
+
+            #         # Atualiza as colunas com os valores concatenados
+            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloPassivoNome"] = ", ".join(nomesPassivo)
+            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloPassivoTipo"] = ", ".join(tiposPassivo)
+            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloPassivoCPF"] = ", ".join(cpfsPassivo)
+            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloPassivoCNPJ"] = ", ".join(cnpjsPassivo)
 
             df["typeTribunal"] = df["tribunal"].str.split("-").str[0].str.lower()
             df["endpoint"] = df["tribunal"].str.split("-").str[1]
