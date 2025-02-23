@@ -27,12 +27,46 @@ class ReadEscavador():
 
             df = self.dataframe.to_DataFrame(dictData)
 
+            # Inicializa as colunas como strings vazias
+            df["poloAtivoNome"] = ""
+            df["poloAtivoTipo"] = ""
+            df["poloAtivoCPF"] = ""
+            df["poloAtivoCNPJ"] = ""
+
+            df["poloPassivoNome"] = ""
+            df["poloPassivoTipo"] = ""
+            df["poloPassivoCPF"] = ""
+            df["poloPassivoCNPJ"] = ""
+
+            # Itera sobre a lista de dicionários
+            for item in dictData:
+                if "poloAtivo" in item:
+                    self.logger.INFO(f"Processing data from process number: {item['numeroProcesso']}")
+                    nomesAtivo = []
+                    tiposAtivo = []
+                    cpfsAtivo = []
+                    cnpjsAtivo = []
+
+                    # Itera sobre os envolvidos no polo ativo
+                    for envolvido in item["poloAtivo"]:
+                        self.logger.INFO(f"Processing data from envolved: {envolvido.get('nome', '')}")
+                        nomesAtivo.append(envolvido.get("nome", ""))
+                        tiposAtivo.append(envolvido.get("tipo", ""))
+                        self.logger.INFO(f"CPF: {envolvido.get('cpf', '')}")
+                        cpfsAtivo.append(envolvido.get("cpf", ""))
+                        self.logger.INFO(f"CPF: {envolvido.get('cnpj', '')}")
+                        cnpjsAtivo.append(envolvido.get("cnpj", ""))
+
+                    # Atualiza as colunas com os valores concatenados
+                    df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoNome"] = ", ".join(nomesAtivo)
+                    df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoTipo"] = ", ".join(tiposAtivo)
+                    df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoCPF"] = ", ".join(cpfsAtivo)
+                    df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoCNPJ"] = ", ".join(cnpjsAtivo)
+
             df["typeTribunal"] = df["tribunal"].str.split("-").str[0].str.lower()
             df["endpoint"] = df["tribunal"].str.split("-").str[1]
 
             df["numeroProcessoFormated"] = df["numeroProcesso"].apply(self.dataframe.removeSpecialCharacters)
-
-            self.logger.INFO("Data read successfully")
             
             self.logger.INFO("Data from Escavador loaded")
             return df

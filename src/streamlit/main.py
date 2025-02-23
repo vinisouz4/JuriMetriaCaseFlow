@@ -58,10 +58,10 @@ with st.sidebar:
     
     st.text_input("UF", value="", placeholder="Digite o UF")
     
-    client = st.multiselect(
+    client = st.text_input(
         "Cliente", 
-        dfEscavador["cliente"].unique(), 
-        placeholder="Selecione o Cliente"
+        value="", 
+        placeholder="Informe o CNPJ do Cliente"
     )
     
     st.text_input("Advogado", value="", placeholder="Digite o nome do Advogado")
@@ -74,10 +74,12 @@ with st.sidebar:
 
 
 
-poloAtivo, poloPassivo = escavador.processAtivoPassivo(dfEscavador, numberProcess)
+# poloAtivo, poloPassivo = escavador.processAtivoPassivo(dfEscavador, numberProcess)
 
 
-st.write(f"Ativo: {poloAtivo} x Passivo: {poloPassivo}")
+# st.write(f"Ativo: {poloAtivo} x Passivo: {poloPassivo}")
+
+st.dataframe(dfEscavador)
 
 
 # Métricas:
