@@ -74,12 +74,11 @@ with st.sidebar:
 
 
 
-# poloAtivo, poloPassivo = escavador.processAtivoPassivo(dfEscavador, numberProcess)
+poloAtivo, poloPassivo = escavador.processAtivoPassivo(dfEscavador, numberProcess)
 
 
-# st.write(f"Ativo: {poloAtivo} x Passivo: {poloPassivo}")
+st.write(f"Ativo: {poloAtivo} x Passivo: {poloPassivo}")
 
-st.dataframe(dfEscavador)
 
 
 # Métricas:
@@ -160,3 +159,7 @@ st.dataframe(
         client=None
     )
 )
+
+
+st.subheader("Quantidade de Processos Novos e Encerrados Por Mes e Ano atual")
+st.dataframe(dataJud.processNewAndCloset(dfDataJud))
