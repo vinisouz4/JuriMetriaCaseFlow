@@ -10,3 +10,4 @@ polars
 certifi
 plotly
 escavador
+rapidfuzz

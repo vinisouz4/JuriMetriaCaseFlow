@@ -3,6 +3,7 @@ import json
 import escavador
 from escavador.v2 import Processo
 import asyncio
+from rapidfuzz import fuzz
 
 
 from src.adapter.core.config import Settings
@@ -40,6 +41,28 @@ class apiEscavador():
             self.logger.ERROR(f"Error formatting list of process {e}")
             return None
     
+    def getDataPolos(self, retornoEnvolvidos, nome, polo):
+        """
+        retornoEnvolvidos é uma lista do metodo Fontes que me retorna a lista dos envolvidos
+        nome é o nome que eu quero buscar os dados
+        polo é se ele é ativo ou passivo
+        """
+
+        listDataPolo = []
+
+        for envolvido in retornoEnvolvidos:
+            if (fuzz.ratio(envolvido.nome, nome) > 70):
+                dictEnvolvido = {
+                    f"{polo}": True,
+                    "nome": nome,
+                    "cpf": envolvido.cpf,
+                    "cnpj": envolvido.cnpj
+                }
+
+                listDataPolo.append(dictEnvolvido)
+
+        return listDataPolo
+
     async def __getProcessos(self, numeroProcesso, totalProcess):
         """
         Parametros:
@@ -65,7 +88,9 @@ class apiEscavador():
                     "quantidadeMovimentacao": processo.quantidade_movimentacoes,
                     "dataUltimaMovimentacao": processo.data_ultima_movimentacao,
                     "poloAtivo": processo.titulo_polo_ativo,
+                    "dataPolo": self.getDataPolos(processo.fontes[0].envolvidos , processo.titulo_polo_ativo, "Ativo"),
                     "poloPassivo": processo.titulo_polo_passivo,
+                    "dataPolo": self.getDataPolos(processo.fontes[0].envolvidos , processo.titulo_polo_passivo, "Passivo"),
                     "dataInicio": processo.data_inicio,
                     "tribunal": processo.fontes[0].sigla,
                     "tipo": processo.fontes[0].capa.area,

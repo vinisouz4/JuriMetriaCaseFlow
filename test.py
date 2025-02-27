@@ -18,12 +18,10 @@ df = case.getData("Case", "true", True)
 
 teste = escavador.formatListProcess(df)
 
-print(teste[:10])
-
-escavador.saveData(teste[:10])
+escavador.saveData(teste[:5])
 # atualizacao = getDataJud()
 # atualizacao.saveData(df)
 
 
 
-print("FIm")
+print("Fim")
