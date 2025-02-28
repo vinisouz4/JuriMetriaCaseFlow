@@ -153,3 +153,27 @@ class PandasDataFrame():
         except Exception as e:
             self.logger.ERROR(f"Error in concat: {e}")
             return None
+
+    def json_normaliza(self, df, column, suffix = None, listDropColum: list = None):
+        """
+        Parameters:
+        df: pd.DataFrame - DataFrame to normalize
+        column: list - columns to normalize
+        suffix: str - Suffix to add in columns
+        listDropColum: list - List of columns to drop
+        """
+        try:
+            self.logger.INFO(f"Normalizing json columns")
+
+            if listDropColum is not None or suffix is not None:
+                dfFinal = df.join(pd.json_normalize(df[column].explode()).add_suffix(suffix)).drop(columns=listDropColum)
+
+            else:
+                dfFinal = df.join(pd.json_normalize(df[column].explode()).add_suffix(suffix))
+
+            self.logger.INFO("Json columns normalized successfully")
+            
+            return dfFinal
+        except Exception as e:
+            self.logger.ERROR(f"Error in json_normaliza: {e}")
+            return None

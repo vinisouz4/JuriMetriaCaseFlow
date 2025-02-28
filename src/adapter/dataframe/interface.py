@@ -43,3 +43,7 @@ class IDataFrameAdapter(abc.ABC):
     @abc.abstractmethod
     def concat(self, df1, df2, axis):
         pass
+
+    @abc.abstractmethod
+    def json_normaliza(self, df, column, suffix = None, listDropColum: list = None):
+        pass

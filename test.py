@@ -18,7 +18,7 @@ df = case.getData("Case", "true", True)
 
 teste = escavador.formatListProcess(df)
 
-escavador.saveData(teste[:5])
+escavador.saveData(teste[:20])
 # atualizacao = getDataJud()
 # atualizacao.saveData(df)
 

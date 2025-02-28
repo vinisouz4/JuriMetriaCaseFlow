@@ -63,6 +63,7 @@ class apiEscavador():
 
         return listDataPolo
 
+
     async def __getProcessos(self, numeroProcesso, totalProcess):
         """
         Parametros:
@@ -88,9 +89,9 @@ class apiEscavador():
                     "quantidadeMovimentacao": processo.quantidade_movimentacoes,
                     "dataUltimaMovimentacao": processo.data_ultima_movimentacao,
                     "poloAtivo": processo.titulo_polo_ativo,
-                    "dataPolo": self.getDataPolos(processo.fontes[0].envolvidos , processo.titulo_polo_ativo, "Ativo"),
+                    "dataPoloAtivo": self.getDataPolos(processo.fontes[0].envolvidos , processo.titulo_polo_ativo, "Ativo"),
                     "poloPassivo": processo.titulo_polo_passivo,
-                    "dataPolo": self.getDataPolos(processo.fontes[0].envolvidos , processo.titulo_polo_passivo, "Passivo"),
+                    "dataPoloPassivo": self.getDataPolos(processo.fontes[0].envolvidos , processo.titulo_polo_passivo, "Passivo"),
                     "dataInicio": processo.data_inicio,
                     "tribunal": processo.fontes[0].sigla,
                     "tipo": processo.fontes[0].capa.area,

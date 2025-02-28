@@ -27,68 +27,16 @@ class ReadEscavador():
 
             df = self.dataframe.to_DataFrame(dictData)
 
-            # # Inicializa as colunas como strings vazias
-            # df["poloAtivoNome"] = ""
-            # df["poloAtivoTipo"] = ""
-            # df["poloAtivoCPF"] = ""
-            # df["poloAtivoCNPJ"] = ""
-
-            # df["poloPassivoNome"] = ""
-            # df["poloPassivoTipo"] = ""
-            # df["poloPassivoCPF"] = ""
-            # df["poloPassivoCNPJ"] = ""
-
-            # # Itera sobre a lista de dicionários
-            # for item in dictData:
-            #     if "poloAtivo" in item:
-            #         self.logger.INFO(f"Processing data from process number: {item['numeroProcesso']}")
-            #         nomesAtivo = []
-            #         tiposAtivo = []
-            #         cpfsAtivo = []
-            #         cnpjsAtivo = []
-
-            #         # Itera sobre os envolvidos no polo ativo
-            #         for envolvido in item["poloAtivo"]:
-            #             self.logger.INFO(f"Processing data from envolved: {envolvido.get('nome', '')}")
-            #             nomesAtivo.append(envolvido.get("nome", "") or "")
-            #             tiposAtivo.append(envolvido.get("tipo", "") or "")
-            #             cpfsAtivo.append(envolvido.get("cpf", "") or "")
-            #             cnpjsAtivo.append(envolvido.get("cnpj", "") or "")
-
-            #         # Atualiza as colunas com os valores concatenados
-            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoNome"] = ", ".join(nomesAtivo)
-            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoTipo"] = ", ".join(tiposAtivo)
-            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoCPF"] = ", ".join(cpfsAtivo)
-            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloAtivoCNPJ"] = ", ".join(cnpjsAtivo)
-
-            #     if "poloPassivo" in item:
-            #         self.logger.INFO(f"Processing data from process number: {item['numeroProcesso']}")
-            #         nomesPassivo = []
-            #         tiposPassivo = []
-            #         cpfsPassivo = []
-            #         cnpjsPassivo = []
-
-            #         # Itera sobre os envolvidos no polo passivo
-            #         for envolvido in item["poloPassivo"]:
-            #             self.logger.INFO(f"Processing data from envolved: {envolvido.get('nome', '')}")
-            #             nomesPassivo.append(envolvido.get("nome", "") or "")
-            #             tiposPassivo.append(envolvido.get("tipo", "") or "")
-            #             cpfsPassivo.append(envolvido.get("cpf", "") or "")
-            #             cnpjsPassivo.append(envolvido.get("cnpj", "") or "")
-
-            #         # Atualiza as colunas com os valores concatenados
-            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloPassivoNome"] = ", ".join(nomesPassivo)
-            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloPassivoTipo"] = ", ".join(tiposPassivo)
-            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloPassivoCPF"] = ", ".join(cpfsPassivo)
-            #         df.loc[df["numeroProcesso"] == item["numeroProcesso"], "poloPassivoCNPJ"] = ", ".join(cnpjsPassivo)
-
             df["typeTribunal"] = df["tribunal"].str.split("-").str[0].str.lower()
             df["endpoint"] = df["tribunal"].str.split("-").str[1]
 
             df["numeroProcessoFormated"] = df["numeroProcesso"].apply(self.dataframe.removeSpecialCharacters)
+
+            dfExploded = self.dataframe.json_normaliza(df, "dataPoloAtivo", suffix="Ativo", listDropColum=['dataPoloAtivo', "nomeAtivo", "AtivoAtivo"])
+            dfExploded = self.dataframe.json_normaliza(dfExploded, "dataPoloPassivo", suffix="Passivo", listDropColum=['dataPoloPassivo', "nomePassivo", "PassivoPassivo"])
             
             self.logger.INFO("Data from Escavador loaded")
-            return df
+            return dfExploded
         except Exception as e:
             self.logger.ERROR(f"Error getting data from Escavador: {e}")
             return None
