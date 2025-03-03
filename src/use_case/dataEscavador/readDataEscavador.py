@@ -107,3 +107,48 @@ class ReadEscavador():
         except Exception as e:
             self.logger.ERROR(f"Error getting total of tribunals: {e}")
             return None
+
+    def totalClient(self, df, processNumber: str = None, client: str = None, clientHvk = list):
+        try:
+            self.logger.INFO("Getting total of clients")
+
+            df = self.utils.findClient(df, clientHvk)
+
+            if processNumber != "" and processNumber is not None or client != "" and client is not None:
+                self.logger.INFO(f"Filtering data by process number: {processNumber}")
+                df = df[
+                    df["numeroProcessoFormated"] == processNumber
+                ]
+
+                self.logger.INFO(f"Filtering data by client: {client}")
+                df = df[
+                    df["cpf_cnpj"] == client
+                ]
+
+                dfGrouped = df.groupby('name').size().reset_index(name='Total')
+                
+                self.logger.INFO("Total of clients counted successfully")    
+                
+                return dfGrouped
+            
+            else:
+                self.logger.INFO("No filter by client")
+
+                
+
+                # dfGrouped = df.groupby('name').size().reset_index(name='Total')
+
+                # dfGrouped.rename(
+                #     columns={
+                #         "name": "Cliente"
+                #     }, 
+                #     inplace=True
+                # )
+
+                # self.logger.INFO("Total of clients counted successfully")
+
+                return df
+            
+        except Exception as e:
+            self.logger.ERROR(f"Error getting total of clients: {e}")
+            return None

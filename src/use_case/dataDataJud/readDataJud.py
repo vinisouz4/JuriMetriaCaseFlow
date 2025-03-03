@@ -227,7 +227,7 @@ class ReadDataJud():
 
             # Criar um DataFrame de Calendário
 
-            calendario = self.dataframe.DataFrame({
+            calendario = self.dataframe.from_dict({
                 "ano": [ano for ano, mes in combinacoes],
                 "mes": [mes for ano, mes in combinacoes]
             })

@@ -33,7 +33,7 @@ class IDataFrameAdapter(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def DataFrame(self, data: dict):
+    def from_dict(self, data: dict):
         pass
 
     @abc.abstractmethod

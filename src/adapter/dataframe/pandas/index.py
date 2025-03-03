@@ -13,7 +13,7 @@ class PandasDataFrame():
         
         return pd.read_csv(path)
     
-    def DataFrame(self, data: dict) -> pd.DataFrame:
+    def from_dict(self, data: dict) -> pd.DataFrame:
         
         self.logger.INFO(f"Converting data to DataFrame")
         

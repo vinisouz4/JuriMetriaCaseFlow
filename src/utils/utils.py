@@ -1,8 +1,8 @@
 import json
 from datetime import datetime
-
+from validate_docbr import CPF, CNPJ
 from src.adapter.logging.logging import LoggerHandler
-
+import pandas as pd
 
 class Utils():
     def __init__(self):
@@ -117,3 +117,67 @@ class Utils():
         }
         self.logger.INFO(f"Number of month retrieved successfully")
         return months.get(month, None)
+    
+    def validateDoc(self, doc):
+        try:
+            self.logger.INFO(f"Validating document: {doc}")
+            
+            doc = str(doc).replace(".", "").replace("-", "").replace("/", "")
+            
+            if len(doc) == 11:
+                cpf = CPF()
+                self.logger.INFO(f"Document validated successfully CPF")
+                self.logger.INFO(f"{cpf.validate(doc)}")
+                return cpf.validate(doc)
+            
+            elif len(doc) == 14:
+                cnpj = CNPJ()
+                self.logger.INFO(f"Document validated successfully CNPJ")
+                self.logger.INFO(f"{cnpj.validate(doc)}")
+                return cnpj.validate(doc)
+
+            else:
+                self.logger.INFO("Document not validated")
+                return False
+            
+        except Exception as e:
+            self.logger.ERROR(f"Error validating document: {e}")
+            return False
+
+
+    def findClient(self, df, clientList):
+        try:
+            self.logger.INFO(f"Finding client")
+
+            df[["cpfAtivo", "cpfPassivo", "cnpjAtivo", "cnpjPassivo"]] = df[["cpfAtivo", "cpfPassivo", "cnpjAtivo", "cnpjPassivo"]].astype(str).fillna("")
+
+            mask = df.apply(lambda row: any(client in row.values for client in clientList), axis=1)
+
+            self.logger.INFO("Client not found")
+            return df[mask]
+        
+        except Exception as e:
+            self.logger.ERROR(f"Error finding client: {e}")
+            return None
+        
+    def converter_tempo(self, tempo):
+        try:
+            if pd.isna(tempo):
+                return 0
+            tempo = str(tempo).lower()
+            if "year" in tempo:
+                return int(tempo.split()[0]) * 365
+            if "month" in tempo:
+                return int(tempo.split()[0]) * 30
+            if "week" in tempo:
+                return int(tempo.split()[0]) * 7
+            if "day" in tempo:
+                return int(tempo.split()[0])
+            if "hour" in tempo:
+                return int(tempo.split()[0]) / 24
+            else:
+                return 0
+            
+        except Exception as e:
+            self.logger.ERROR(f"Error converting time: {e}")
+            return None

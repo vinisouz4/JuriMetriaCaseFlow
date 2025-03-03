@@ -29,6 +29,8 @@ dfCaseFlow = dataCaseFlow.getData(
     removeSpecialCharacters=True
 )
 
+dfClients = dataCaseFlow.getClients("Client")
+
 dfEscavador = escavador.getData()
 
 dfDataJud, notFoundProcess = dataJud.readDataJud()
@@ -59,9 +61,8 @@ with st.sidebar:
     st.text_input("UF", value="", placeholder="Digite o UF")
     
     client = st.text_input(
-        "Cliente", 
-        value="", 
-        placeholder="Informe o CNPJ do Cliente"
+        "Cliente",
+        placeholder="CPF ou CNPJ do Cliente",
     )
     
     st.text_input("Advogado", value="", placeholder="Digite o nome do Advogado")
@@ -72,6 +73,16 @@ with st.sidebar:
         placeholder="Selecione o Tribunal"
     )
 
+
+dfTramitacao = dataJud.meanDateProcess(
+    allMoviments.explode(
+        [
+            "movimentos", 
+            "dataMovimentacao"
+        ]
+    ),
+    numberProcess
+)
 
 
 poloAtivo, poloPassivo = escavador.processAtivoPassivo(dfEscavador, numberProcess)
@@ -139,27 +150,68 @@ st.plotly_chart(fig)
 
 st.subheader("Tempo de Tramiatação dos Processos")
 st.dataframe(
-    dataJud.meanDateProcess(
-        allMoviments.explode(
-            [
-                "movimentos", 
-                "dataMovimentacao"
-            ]
-        ),
-        numberProcess
-    )
+    dfTramitacao
 )
 
+st.subheader("Analise de Processos Judiciais")
+
+dfTramitacao["tempoTotalTramitacaoDias"] = dfTramitacao["tempoTotalTramitacao"].apply(util.converter_tempo)
+dfTramitacao["tempoMedioMovimentacaoDias"] = dfTramitacao["tempoMedioMovimentacao"].apply(util.converter_tempo)
+
+# Converter os valores por dias de tramitação
+fig1 = px.histogram(
+    dfTramitacao,
+    x="tempoTotalTramitacaoDias",
+    nbins=20,
+    title="Distribuição do tempo de tramitação dos processos (Dias)",
+    text_auto=True,
+)
+
+fig1.update_layout(
+    xaxis_title="Dias",
+    yaxis_title="Quantidade de Processos",
+    bargap=0.1
+)
+
+st.plotly_chart(fig1)
+
+
+
+
+
+
 st.subheader("Quantidades por Tribunal")
-st.dataframe(
+
+figtb = px.bar(
     escavador.totalTribunal(
         dfEscavador, 
         processNumber = None, 
         tribunal = tribunal, 
         client=None
-    )
+    ),
+    x="Tribunal",
+    y="Total",
+    color="Tribunal",
+    text="Total"
 )
+
+figtb.update_traces(textposition='outside')
+
+st.plotly_chart(figtb)
 
 
 st.subheader("Quantidade de Processos Novos e Encerrados Por Mes e Ano atual")
 st.dataframe(dataJud.processNewAndCloset(dfDataJud))
+
+
+st.subheader("Quantidade de Processos por Cliente")
+st.dataframe(
+    escavador.totalClient(
+        dfEscavador, 
+        processNumber = None, 
+        client = client,
+        clientHvk = dfClients["cpf_cnpj"].tolist()
+    )
+)
+
+st.dataframe(dfClients)

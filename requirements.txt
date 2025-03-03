@@ -11,3 +11,5 @@ certifi
 plotly
 escavador
 rapidfuzz
+validate-docbr
+statsmodels

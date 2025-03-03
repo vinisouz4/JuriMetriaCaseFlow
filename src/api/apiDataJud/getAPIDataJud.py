@@ -36,6 +36,7 @@ class getDataJud():
 
         """
         Metodo para buscar os processo na API do DataJud e salvar um arquivo no Data Lake com os dados
+        df -> Dataframe com os processos retornados no Escavador
         """
 
         try:

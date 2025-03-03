@@ -35,3 +35,26 @@ class ReadCaseFlowData():
         dfData["value_cause"] = dfData["value_cause"].apply(self.dataframe.convertToFloat)
         
         return dfData
+    
+    def getClients(self, table):
+        try:
+            self.logger.INFO("Reading data from Supabase")
+            
+            data = self.supabase.getData(table)
+            
+            self.logger.INFO(f"Len data {len(data)}")
+            
+            df = self.dataframe.to_DataFrame(data)
+            
+            df = df[["id", "name", "cpf_cnpj"]]
+
+            dfFinal = df[df["cpf_cnpj"].apply(self.utils.validateDoc)]
+
+            dfFinal["cpf_cnpj"] = dfFinal["cpf_cnpj"].str.replace('.', '').str.replace('-', '').str.replace('/', '')
+            
+            self.logger.INFO("Data read successfully")
+            return dfFinal
+        
+        except Exception as e:
+            self.logger.ERROR(f"Error reading data from Supabase: {e}")
+            return None
