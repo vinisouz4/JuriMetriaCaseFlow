@@ -122,14 +122,28 @@ class ReadDataJud():
             self.logger.ERROR(f"Error in readDataJud: {e}")
             return None
         
-    def totalStatus(self, df, numberProcess: str = None):
+    def totalStatus(self, df, numberProcess: str = None, status: list = None):
         try:
 
             """
             Método para contar a quantidade de processos por status
+            
+            Parametros:
+            - df -> Dataframe do datajud apenas com a data de ajuizamento e a data do ultimo movimento e os status
+            - numberProcess -> Número do processo para filtrar
+            - status -> Lista de status para filtrar
             """
 
             self.logger.INFO("Starting totalStatus")
+
+            if status is not None and status != []:
+                self.logger.INFO(f"Filtering data by status: {status}")
+
+                df = df[
+                    df["movimentos"].isin(status)
+                ]
+
+                self.logger.INFO("Status counted successfully")
 
             if numberProcess is not None and numberProcess != "":
                 self.logger.INFO(f"Filtering data by process number: {numberProcess}")
@@ -138,20 +152,11 @@ class ReadDataJud():
                     df["numeroProcesso"] == numberProcess
                 ]
                 
-                data = df.groupby('movimentos').size().reset_index(name='total')
-                
-                self.logger.INFO("Status counted successfully")
-                
-                return data
-
-            else:
-                self.logger.INFO("Filtering data by process number: None")
-
-                data = df.groupby('movimentos').size().reset_index(name='total')
-
-                self.logger.INFO("Status counted successfully")
-
-                return data
+            data = df.groupby('movimentos').size().reset_index(name='total')
+            
+            self.logger.INFO("Status counted successfully")
+            
+            return data
 
         except Exception as e:
             self.logger.ERROR(f"Error in totalStatus: {e}")
@@ -277,12 +282,66 @@ class ReadDataJud():
             )
             
             resultadoFinal = resultadoFinal.fillna(0)
+
+            resultadoFinal["mesAno"] = resultadoFinal["ano"].astype(str) + "/" + resultadoFinal["mes"].astype(str)
+
+            resultadoFinal = resultadoFinal[
+                (resultadoFinal["ano"] == self.utils.getToday().year) & 
+                (resultadoFinal["mes"] <= self.utils.getToday().month) |
+                (resultadoFinal["ano"] == self.utils.getToday().year - 1)
+            ]
             
 
             self.logger.INFO("Process calculated successfully")
 
-            return resultadoFinal
+            return resultadoFinal[["mesAno", "Novos", "Encerrados"]]
 
         except Exception as e:
             self.logger.ERROR(f"Error in processNewAndCloset: {e}")
+            return None
+
+    def qtdMovProcess(self, df, year: int = None):
+        """
+        Método para contar a quantidade de movimentações por processo considerando a data de ultima movimentação
+        df -> Dataframe do datajud apenas com a data de ajuizamento e a data do ultimo movimento e os status
+        """
+
+        try:
+
+            year = self.utils.getToday().year - 1
+            
+            self.logger.INFO("Starting qtdMovProcess")
+
+            df = self.dataframe.to_datetime(df, ["dataUltimoMovimento"])
+
+            df["anoMovimentacao"] = df["dataUltimoMovimento"].dt.year
+            df["mesMovimentacao"] = df["dataUltimoMovimento"].dt.month
+
+            if year is not None:
+                self.logger.INFO(f"Filtering data by year: {year}")
+                df = df[
+                    (df["anoMovimentacao"] >= year)
+                ]
+
+                data = df.groupby(["anoMovimentacao", "mesMovimentacao"]).size().reset_index(name="totalMovimentacoes")
+
+                data["periodoMovimentacao"] = data["anoMovimentacao"].astype(str) + "/" + data["mesMovimentacao"].astype(str)
+
+                self.logger.INFO("Process calculated successfully")
+
+                return data
+            
+            else:
+                self.logger.INFO(f"Filtering data by month: None and year: None")
+
+                data = df.groupby(["anoMovimentacao", "mesMovimentacao"]).size().reset_index(name="totalMovimentacoes")
+
+                data["periodoMovimentacao"] = data["anoMovimentacao"].astype(str) + "/" + data["mesMovimentacao"].astype(str)
+
+                self.logger.INFO("Process calculated successfully")
+
+                return data
+        
+        except Exception as e:
+            self.logger.ERROR(f"Error in qtdMovProcess: {e}")
             return None

@@ -24,6 +24,8 @@ df = case.getData("Case", "true", True)
 
 listProcess = escavador.formatListProcess(df)
 
-escavador.saveData(listProcess[:40])
+logger.INFO(f"Quantidade de Numero de Processos Validados e Corretos {len(listProcess)}")
+
+escavador.saveData(listProcess[:500])
 
 logger.INFO("Finished Update Escavador")

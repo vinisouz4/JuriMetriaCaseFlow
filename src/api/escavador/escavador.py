@@ -34,6 +34,8 @@ class apiEscavador():
 
             listProcess = df["external_number"].unique().tolist()
 
+            listProcess = [processo for processo in listProcess if self.util.validadorCNJ(processo)]
+
             self.logger.INFO(f"Formatted list of process, len listProcess {len(listProcess)}")
 
             return listProcess

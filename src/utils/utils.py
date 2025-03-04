@@ -181,3 +181,13 @@ class Utils():
         except Exception as e:
             self.logger.ERROR(f"Error converting time: {e}")
             return None
+
+    def validadorCNJ(self, numero_processo):
+        """
+        Validador de número CNJ no qual o numero não deve ter letras e deve ter 20 caracteres
+        """
+        try:
+            return isinstance(numero_processo, str) and len(numero_processo) == 20 and numero_processo.isnumeric()
+        except Exception as e:
+            self.logger.ERROR(f"Error validating CNJ: {e}")
+            return False

@@ -114,40 +114,45 @@ class ReadEscavador():
 
             df = self.utils.findClient(df, clientHvk)
 
-            if processNumber != "" and processNumber is not None or client != "" and client is not None:
-                self.logger.INFO(f"Filtering data by process number: {processNumber}")
-                df = df[
-                    df["numeroProcessoFormated"] == processNumber
-                ]
-
-                self.logger.INFO(f"Filtering data by client: {client}")
-                df = df[
-                    df["cpf_cnpj"] == client
-                ]
-
-                dfGrouped = df.groupby('name').size().reset_index(name='Total')
-                
-                self.logger.INFO("Total of clients counted successfully")    
-                
-                return dfGrouped
             
+            if processNumber != "" and processNumber is not None:
+                self.logger.INFO(f"Filtering data by process number: {processNumber}")
+                df = df[df["numeroProcessoFormated"] == processNumber]
+
+            if client != "" and client is not None:
+                self.logger.INFO(f"Filtering data by client: {client}")
+                
+                df = df[
+                    (df["cpfAtivo"] == client) | 
+                    (df["cpfPassivo"] == client) | 
+                    (df["cnpjAtivo"] == client) | 
+                    (df["cnpjPassivo"] == client)
+                ]
+
             else:
                 self.logger.INFO("No filter by client")
 
-                
+            # Agrupamento dos dados
+            dfGroupedAtivo = df.groupby("poloAtivo").size().reset_index(name='Total')
+            dfGroupedPassivo = df.groupby("poloPassivo").size().reset_index(name='Total')
 
-                # dfGrouped = df.groupby('name').size().reset_index(name='Total')
+            dfGroupedAtivo.rename(
+                columns={
+                    "poloAtivo": "Polo Ativo"
+                }, 
+                inplace=True
+            )
 
-                # dfGrouped.rename(
-                #     columns={
-                #         "name": "Cliente"
-                #     }, 
-                #     inplace=True
-                # )
+            dfGroupedPassivo.rename(
+                columns={
+                    "poloPassivo": "Polo Passivo"
+                }, 
+                inplace=True
+            )
 
-                # self.logger.INFO("Total of clients counted successfully")
+            self.logger.INFO("Total of clients counted successfully")
 
-                return df
+            return dfGroupedAtivo, dfGroupedPassivo
             
         except Exception as e:
             self.logger.ERROR(f"Error getting total of clients: {e}")

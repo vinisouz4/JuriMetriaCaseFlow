@@ -58,19 +58,21 @@ with st.sidebar:
         placeholder="Digite o numero do processo"
     )
     
-    st.text_input("UF", value="", placeholder="Digite o UF")
-    
     client = st.text_input(
         "Cliente",
         placeholder="CPF ou CNPJ do Cliente",
     )
     
-    st.text_input("Advogado", value="", placeholder="Digite o nome do Advogado")
-    
     tribunal = st.multiselect(
         "Tribunal", 
         dfEscavador["tribunal"].unique(), 
         placeholder="Selecione o Tribunal"
+    )
+
+    status = st.multiselect(
+        "Status",
+        dfDataJud["movimento"].unique(),
+        placeholder="Selecione o Status"
     )
 
 
@@ -112,32 +114,46 @@ distributionData.metric(
     thirtyDays
 )
 
+# =======================================================================
+
 st.subheader("Processos não encontrados")
 
 if notFoundProcess.shape[0] > 0:
     st.write(notFoundProcess)
 else:
-    st.write("Todos os Processos Encontrados")
+    st.write("Todos os Processos Encontrados no DataJud")
+
+# =======================================================================
+
+st.subheader("Quantidade de Processos por Status os Top 10")
+
+totalStatus = dataJud.totalStatus(
+    allMoviments.explode(
+        "movimentos"
+    ),
+    numberProcess,
+    status).sort_values(by="total", ascending=False).head(10)
 
 
-st.subheader("Quantidade de Processos por Status")
-st.dataframe(
-    dataJud.totalStatus(
-        allMoviments.explode(
-            "movimentos"
-        ),
-        numberProcess
-    )
+figStatus = px.bar(
+    totalStatus,
+    x="movimentos",
+    y="total",
+    labels={"total": "Quantidade de Processos", "movimentos": "Status"},
+    color="movimentos",
+    text="total",
+    orientation="v"
 )
 
+st.plotly_chart(figStatus, help="Top 10 Status de Processos com mais quantidade")
 
+# =======================================================================
 st.subheader("Quantidade das causas por UF")
 
 fig = px.bar(
     dfUf, 
     x="uf", 
     y="uf_count",
-    title="Quantidade de causas por UF",
     labels={"uf_count": "Quantidade de causas", "uf": "UF"},
     color="uf",
     category_orders={"uf_count": dfUf["uf_count"].tolist()},
@@ -148,12 +164,9 @@ fig.update_traces(textposition='outside')
 
 st.plotly_chart(fig)
 
-st.subheader("Tempo de Tramiatação dos Processos")
-st.dataframe(
-    dfTramitacao
-)
+# =======================================================================
 
-st.subheader("Analise de Processos Judiciais")
+st.subheader("Distribuição do tempo de tramitação dos processos (Dias)")
 
 dfTramitacao["tempoTotalTramitacaoDias"] = dfTramitacao["tempoTotalTramitacao"].apply(util.converter_tempo)
 dfTramitacao["tempoMedioMovimentacaoDias"] = dfTramitacao["tempoMedioMovimentacao"].apply(util.converter_tempo)
@@ -163,7 +176,6 @@ fig1 = px.histogram(
     dfTramitacao,
     x="tempoTotalTramitacaoDias",
     nbins=20,
-    title="Distribuição do tempo de tramitação dos processos (Dias)",
     text_auto=True,
 )
 
@@ -175,11 +187,30 @@ fig1.update_layout(
 
 st.plotly_chart(fig1)
 
+st.subheader("Tempo de Tramitação dos Processos")
+st.dataframe(
+    dfTramitacao
+)
 
 
+# =======================================================================
+st.subheader("Quantidade de Movimentação por Data de Movimentação")
+
+figMov = px.line(
+    dataJud.qtdMovProcess(dfDataJud),
+    x="periodoMovimentacao",
+    y="totalMovimentacoes",
+    labels={"totalMovimentacoes": "Quantidade de Movimentos", "periodoMovimentacao": "Data Movimentação"},
+    text="totalMovimentacoes"
+)
+
+figMov.update_traces(textposition='top center')
+figMov.update_xaxes(tickangle=45)
+
+st.plotly_chart(figMov)
 
 
-
+# =======================================================================
 st.subheader("Quantidades por Tribunal")
 
 figtb = px.bar(
@@ -196,22 +227,47 @@ figtb = px.bar(
 )
 
 figtb.update_traces(textposition='outside')
+figtb.update_xaxes(tickangle=45)
 
 st.plotly_chart(figtb)
 
-
+# =======================================================================
 st.subheader("Quantidade de Processos Novos e Encerrados Por Mes e Ano atual")
-st.dataframe(dataJud.processNewAndCloset(dfDataJud))
 
+qtdNewClose = dataJud.processNewAndCloset(dfDataJud)
 
-st.subheader("Quantidade de Processos por Cliente")
-st.dataframe(
-    escavador.totalClient(
-        dfEscavador, 
-        processNumber = None, 
-        client = client,
-        clientHvk = dfClients["cpf_cnpj"].tolist()
-    )
+figNewClose = px.line(
+    qtdNewClose.melt(id_vars="mesAno", var_name="Status", value_name="Quantidade"),
+    x="mesAno",
+    y="Quantidade",
+    color="Status",
+    markers=True,
+    labels={"Quantidade": "Quantidade de Processos", "mesAno": "Mês e Ano"},
+    color_discrete_map={"Novos": "#0000ff", "Encerrados": "#008000"},
+    text="Quantidade"
+    
 )
 
-st.dataframe(dfClients)
+figNewClose.update_xaxes(tickangle=45)
+figNewClose.update_traces(textposition='top center')
+
+st.plotly_chart(figNewClose)
+
+# =======================================================================
+st.subheader("Quantidade de Processos por Cliente")
+
+dfAtivo, dfPassivo = escavador.totalClient(
+    dfEscavador, 
+    processNumber = numberProcess, 
+    client = client,
+    clientHvk = dfClients["cpf_cnpj"].tolist()
+)
+
+
+st.dataframe(
+    dfAtivo.sort_values(by="Total", ascending=False).head(10)
+)
+
+st.dataframe(
+    dfPassivo.sort_values(by="Total", ascending=False).head(10)
+)
