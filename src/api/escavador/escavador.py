@@ -96,7 +96,7 @@ class apiEscavador():
                     "dataPoloPassivo": self.getDataPolos(processo.fontes[0].envolvidos , processo.titulo_polo_passivo, "Passivo"),
                     "dataInicio": processo.data_inicio,
                     "tribunal": processo.fontes[0].sigla,
-                    "tipo": processo.fontes[0].capa.area,
+                    "tipo": processo.fontes[0].capa.area if processo.fontes[0].capa else None,
                 }
 
                 self.listProcess.append(dictProcess)
@@ -118,9 +118,13 @@ class apiEscavador():
                 self.listProcess.append(dictProcess)
 
             self.logger.INFO(f"Got process")
+
+            self.logger.INFO(f"Sleeping 3 seconds")
+            await asyncio.sleep(3)
+
             async with self.lock:
                 self.executedProcess += 1
-                self.logger.INFO(f"Executed process {self.executedProcess}/{totalProcess}")
+                self.logger.INFO(f"Executed process {self.executedProcess}/{totalProcess} - {numeroProcesso}")
 
             return processList
         except Exception as e:

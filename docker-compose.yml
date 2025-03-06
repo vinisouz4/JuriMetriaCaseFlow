@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  updateDataJud:
+    image: update-data-jud
+    build:
+      context: .
+      dockerfile: dockerfile.jud
+    container_name: updateDataJud
+    command: ["python", "/app/update/updateDataJud/datajud.py"]
+    volumes:
+      - .:app
+
+  streamlit:
+    image: streamlit
+    build:
+      context: .
+      dockerfile: dockerfile.streamlit
+    container_name: streamlit_app
+    command: ["streamlit", "run", "/app/streamlit/streamlit.py"]
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:app

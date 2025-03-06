@@ -157,3 +157,33 @@ class ReadEscavador():
         except Exception as e:
             self.logger.ERROR(f"Error getting total of clients: {e}")
             return None
+
+    def totalTipo(self, df):
+        """
+        Metodo para buscar a quantidade de processos por tipo
+
+        Parametros:
+        -----------
+        df: DataFrame
+            DataFrame com os dados do escavador
+        """
+
+        try:
+            self.logger.INFO("Getting total of types")
+
+            dfGrouped = df.groupby('tipo').size().reset_index(name='Total')
+
+            dfGrouped.rename(
+                columns={
+                    "tipo": "Tipo"
+                }, 
+                inplace=True
+            )
+
+            self.logger.INFO("Total of types counted successfully")
+
+            return dfGrouped
+            
+        except Exception as e:
+            self.logger.ERROR(f"Error getting total of types: {e}")
+            return None

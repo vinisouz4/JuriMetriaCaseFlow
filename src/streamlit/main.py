@@ -232,6 +232,23 @@ figtb.update_xaxes(tickangle=45)
 st.plotly_chart(figtb)
 
 # =======================================================================
+
+st.subheader("Quantidade de Processos por Tipo")
+
+figType = px.bar(
+    escavador.totalTipo(dfEscavador),
+    x="Tipo",
+    y="Total",
+    color="Tipo",
+    text="Total"
+)
+
+figType.update_traces(textposition='outside')
+figType.update_xaxes(tickangle=45)
+
+st.plotly_chart(figType)
+
+# =======================================================================
 st.subheader("Quantidade de Processos Novos e Encerrados Por Mes e Ano atual")
 
 qtdNewClose = dataJud.processNewAndCloset(dfDataJud)
