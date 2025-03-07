@@ -22,3 +22,13 @@ services:
       - "8501:8501"
     volumes:
       - .:app
+
+  updateEscavador:
+    image: update-escavador
+    build:
+      context: .
+      dockerfile: dockerfile.escavador
+    container_name: updateEscavador
+    command: ["python", "/app/update/updateEscavador/escavador_update.py"]
+    volumes:
+      - .:app

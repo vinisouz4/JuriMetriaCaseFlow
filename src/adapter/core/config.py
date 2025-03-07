@@ -18,6 +18,9 @@ class Settings():
 
         ESCAVADOR_KEY = os.getenv("ESCAVADOR_KEY")
 
+        UPDATE_DAY = os.getenv("UPDATE_DAY")
+        UPDATE_HOUR = os.getenv("UPDATE_HOUR")
+
     except Exception as e:
         API_SUPABASE_URL = None
         API_SUPABASE_KEY = None
@@ -28,3 +31,5 @@ class Settings():
         PATH_EXCEL_TESTE = None
 
         DATALAKE_URL = None
+
+        UPDATE_DAY = None

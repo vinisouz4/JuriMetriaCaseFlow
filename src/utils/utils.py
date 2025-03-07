@@ -69,7 +69,7 @@ class Utils():
             self.logger.INFO("Getting today's date")
             self.logger.INFO("Today's date retrieved successfully")
 
-            return datetime.today().date()
+            return datetime.today()
         
         except Exception as e:
             self.logger.ERROR(f"Error getting today's date: {e}")
